@@ -1,6 +1,7 @@
-const express = require("express");
-const router = XPathExpression.router();
+const express = require('express');
+const router = express.Router();
 
-router.get("/", getall);
+const { getAll } = require('../controllers/userController');
+router.get('/', getAll);
 
 module.exports = router;

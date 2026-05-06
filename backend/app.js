@@ -6,11 +6,12 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 
-const notFound = require('./middleware/notFound');
-const errorhandler = require('./middleware/errorHandler');
-const requestTime = require('./middleware/requestTime');
-const responseHandler = require('./middleware/responseHandler');
-const userRoute = require('./routes/userRoute');
+const notFound = require('./src/middleware/notFound');
+const errorhandler = require('./src/middleware/errorHandler');
+const requestTime = require('./src/middleware/requestTime');
+const responseHandler = require('./src/middleware/responseHandler');
+
+const userRoute = require('./src/routes/userRoute');
 
 const app = express();
 
