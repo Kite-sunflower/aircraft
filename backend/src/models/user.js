@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
@@ -11,18 +11,19 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      select: false,
     },
     role: {
       type: String,
-      enum: ["admin", "toolDist", "materialDist", "worker"],
-      default: "worker",
+      enum: ['admin', 'toolDist', 'materialsDist', 'worker'],
+      default: 'worker',
     },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
     return next();
   }
   const salt = await bcrypt.genSalt(10);
@@ -34,4 +35,4 @@ userSchema.methods.matchPassword = async function (enterPwd) {
   return await bcrypt.compare(enterPwd, this.password);
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);

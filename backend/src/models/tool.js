@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const toolSchema = new mongoose.Schema(
   {
     name: {
@@ -12,17 +12,26 @@ const toolSchema = new mongoose.Schema(
     },
     distributor: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
+      default: null,
+    },
+    collector: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       default: null,
     },
     borrower: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       default: null,
+    },
+    usedQuantity: {
+      type: Number,
+      default: 0,
     },
     returner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       default: null,
     },
     borrowTime: {
@@ -35,11 +44,11 @@ const toolSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["avaliable", "disable", "borrowed"],
-      defaule: "avaliable",
+      enum: ['available', 'repair', 'borrowed'],
+      default: 'available',
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Tool", toolSchema);
+module.exports = mongoose.model('Tool', toolSchema);

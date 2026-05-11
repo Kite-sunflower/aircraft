@@ -1,25 +1,72 @@
+const { deleteMany } = require('../models/task');
 const {
-  getAllUser,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
+  getAll,
+  getOne,
+  create,
+  update,
+  deleteId,
+  deleteBatch,
+  roleSetup,
 } = require('../services/userService');
 
-exports.getAll = async (req, res) => {
+exports.getAllUser = async (req, res) => {
   try {
-    const items = await getAllUser();
+    const { page } = req.query;
+    const items = await getAll(page, limit);
     res.sendSuccess(200, items, '获取用户列表');
   } catch (error) {
-    res.sendFail(400, null, '获取用列表失败');
+    res.sendFail(400, null, error.message);
   }
 };
 
-exports.getOne = async (req, res) => {
+exports.getOneUser = async (req, res) => {
   try {
-    const user = await getUser();
+    const user = await getOne(req.params.id);
     res.sendSuccess(200, user, '获取用户成功');
   } catch (error) {
-    res.sendFail(400, null, '获取用户失败');
+    res.sendFail(400, null, error.message);
+  }
+};
+exports.createUser = async (req, res) => {
+  try {
+    const newuser = await create(req.body);
+    res.sendSuccess(201, newuser, '创建用户成功');
+  } catch (error) {
+    res.sendFail(400, null, error.message);
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const updateData = update(req.params.id, req.body);
+    res.sendSuccess(200, updateData, '更新用户成功');
+  } catch (error) {
+    res.sendFail(400, null, error.message);
+  }
+};
+exports.deleteUser = async (res, req) => {
+  try {
+    await deleteId(req.params.id);
+    res.sendSuccess(200, null, '删除用户成功');
+  } catch (error) {
+    res.sendFail(400, null, error.message);
+  }
+};
+exports.deleteBatchUser = async (res, req) => {
+  try {
+    const { ids } = req.body;
+    await deleteBatch(ids);
+    res.sendSuccess(200, null, '批量删除用户成功');
+  } catch (error) {
+    res.sendFail(400, null, error.message);
+  }
+};
+
+exports.roleSetupUser = async (req, res) => {
+  try {
+    const roleUser = roleSetup(req.params.id, req.params.role);
+    res.sendSuccess(201, roleUser, '用户角色修改成功');
+  } catch (error) {
+    res.sendFail(400, null, error.message);
   }
 };

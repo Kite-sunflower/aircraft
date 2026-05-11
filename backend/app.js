@@ -12,7 +12,9 @@ const requestTime = require('./src/middleware/requestTime');
 const responseHandler = require('./src/middleware/responseHandler');
 
 const userRoute = require('./src/routes/userRoute');
-
+const toolRouter = require('./src/routes/toolRoute');
+const taskRouter = require('./src/routes/taskRoute');
+const materialsRouter = require('./src/routes/authRoute');
 const app = express();
 
 app.use(cors());
@@ -24,6 +26,9 @@ app.use(requestTime);
 app.use(responseHandler);
 
 app.use('/api/user', userRoute);
+app.use('/api/tool', toolRouter);
+app.use('/api/task', taskRouter);
+app.use('/api/materials', materialsRouter);
 
 app.use(notFound);
 app.use(errorhandler);
