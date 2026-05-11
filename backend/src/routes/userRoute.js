@@ -11,13 +11,13 @@ const {
   roleSetupUser,
 } = require('../controllers/userController');
 
-const { protect, admin, onself } = require('../middleware/auth');
+const { protect, admin, onlySelf } = require('../middleware/auth');
 
 router.delete('/batch/delete', protect, admin, deleteBatchUser);
 router.get('/', protect, admin, getAllUser);
-router.get('/:id', protect, onself, getOneUser);
+router.get('/:id', protect, onlySelf, getOneUser);
 router.post('/create', protect, admin, createUser);
-router.put('/:id/update', protect, onself, updateUser);
+router.put('/:id/update', protect, onlySelf, updateUser);
 router.delete('/:id/delete', protect, admin, deleteUser);
 
 router.put('/:id/updateRole', protect, admin, roleSetupUser);

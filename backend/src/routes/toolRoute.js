@@ -1,4 +1,4 @@
-const express = reqiure('express');
+const express = require('express');
 const router = express.Router();
 const {
   getAllTool,
@@ -22,6 +22,6 @@ router.delete('/:id/delete', admin, deleteTool);
 
 router.put('/:id/update', toolDist, statusSetupTool);
 router.post('/:id/borrow', toolDist, borrowTool);
-router.post('/:id/return', prodect, returnTool);
+router.post('/:id/return', protect, returnTool);
 
 module.exports = router;

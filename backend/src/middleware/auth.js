@@ -31,25 +31,25 @@ exports.protect = async (req, res, next) => {
     res.sendFail(401, null, '登录已过期,请重新登录');
   }
 };
-exxports.admin = (req, res, next) => {
+exports.admin = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.sendFail(403, null, '权限不足,仅管理员可操作');
   }
   next();
 };
-exxports.toolDist = (req, res, next) => {
+exports.toolDist = (req, res, next) => {
   if (req.user.role !== 'admin' || req.user.role !== 'toolDist') {
     return res.sendFail(403, null, '权限不足,仅管理员和工具管理员可操作');
   }
   next();
 };
-exxports.materialsDist = (req, res, next) => {
+exports.materialsDist = (req, res, next) => {
   if (req.user.role !== 'admin' || req.user.role !== 'materialsDist') {
     return res.sendFail(403, null, '权限不足,仅管理员和材料管理员可操作');
   }
   next();
 };
-exports.onlyself = async (req, res, next) => {
+exports.onlySelf = async (req, res, next) => {
   const loginUserId = req.user._id.toString();
   const targetId = req.params.id;
 

@@ -1,4 +1,4 @@
-const express = reqiure('express');
+const express = require('express');
 const router = express.Router();
 const {
   getAllTask,
@@ -10,7 +10,7 @@ const {
   distributeTask,
   acceptTask,
   finishTask,
-} = require('../controllers/taskControlller');
+} = require('../controllers/taskController');
 
 const { protect, admin } = require('../middleware/auth');
 
