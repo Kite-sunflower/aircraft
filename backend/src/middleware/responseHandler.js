@@ -1,7 +1,8 @@
 module.exports = (req, res, next) => {
-  res.sendError = (statusCode, message) => {
+  res.sendFail = (statusCode, data, message) => {
     return res.status(statusCode).json({
       status: 'fail',
+      data,
       message,
       requestTime: req.requestTime,
     });

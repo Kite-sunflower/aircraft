@@ -11,22 +11,18 @@ exports.getOne = async (id) => {
   return user;
 };
 
-exports.create = async (userDate) => {
-  const { username, password } = userDate;
+exports.create = async (userData) => {
+  const { username, password } = userData;
 
   if (!username || !password) throw new Error('用户名和密码不能为空');
 
-  const user = User.findOne({ username });
+  const user = await User.findOne({ username });
 
-  if (user) throw new Error(400, null, '用户已存在');
-
-  //密码加密
-  const salt = await bcrypt.genSalt(10);
-  const hashedpwd = await bcrypt.hash(password, salt);
+  if (user) throw new Error('用户已存在');
 
   return await User.create({
-    usename: username,
-    password: hashedpwd,
+    username: username,
+    password: password,
   });
 };
 exports.update = async (id, updateDate) => {

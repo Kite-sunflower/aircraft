@@ -10,11 +10,11 @@ exports.registerUser = async (userData) => {
 
 //用户登录
 exports.loginUser = async (username, password) => {
-  const user = await User.findOne({ username });
-  if (user) throw new Error('用户不存在');
+  const user = await User.findOne({ username }).select('+password');
+  if (!user) throw new Error('用户不存在');
 
-  const isMarch = await bcrypt.compare(password, user.password);
-  if (isMarch) throw new Error('密码错误');
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error('密码错误');
 
   //生成token
   const token = jwt.sign(
@@ -25,18 +25,25 @@ exports.loginUser = async (username, password) => {
   return { user, token };
 };
 exports.logoutUser = async () => {
-  return true;
+  return {
+    message: '退出成功，请重新登录',
+  };
 };
 
+exports.profileUser = async (userId) => {
+  const user = await User.findById(userId).select('-password');
+  if (!user) throw new Error('用户不存在');
+  return user;
+};
 exports.updatePasswordUser = async (userId, oldPwd, newPwd) => {
-  const user = User.findById(userId);
+  const user = await User.findById(userId).select('+password');
   if (!user) throw new Error('用户不存在');
 
   const isMatch = await bcrypt.compare(oldPwd, user.password);
   if (!isMatch) throw new Error('旧密码错误');
 
   const salt = await bcrypt.genSalt(10);
-  user.pasword = await bcrypt.hash(newPwd, salt);
+  user.password = await bcrypt.hash(newPwd, salt);
   await user.save();
   return true;
 };

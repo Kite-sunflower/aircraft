@@ -4,8 +4,8 @@ const User = require('../models/user');
 exports.protect = async (req, res, next) => {
   try {
     //获取token
-    const authStr = requestAnimationFrame.headers.authHeader;
-    if (!authHeader || !authStr.startsWith('Bearer ')) {
+    const authStr = req.headers.authorization;
+    if (!authStr || !authStr.startsWith('Bearer ')) {
       return res.sendFail(401, null, '未登录,请先登录');
     }
 
@@ -16,7 +16,7 @@ exports.protect = async (req, res, next) => {
     }
 
     //解密 token（你之前用的是 userId，要对应 login 里的 sign 内容）
-    const decoded = jwt.verify(token, 'mysecertkey');
+    const decoded = jwt.verify(token, process.env.JWT_SERECT || 'myserectkey');
 
     //查询用户
     const user = await User.findById(decoded.id);
@@ -28,7 +28,7 @@ exports.protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    res.sendFail(401, null, '登录已过期,请重新登录');
+    res.sendFail(401, null, error.message);
   }
 };
 exports.admin = (req, res, next) => {

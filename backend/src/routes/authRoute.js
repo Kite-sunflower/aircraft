@@ -10,10 +10,11 @@ const {
 } = require('../controllers/authController');
 
 const { protect } = require('../middleware/auth');
+
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', protect, logout);
-router.post('/getInfo', protect, getInfo);
+router.get('/profile', protect, getInfo);
 router.post('/updatePwd', protect, updatePassword);
 
 module.exports = router;

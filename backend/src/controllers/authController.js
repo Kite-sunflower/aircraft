@@ -3,7 +3,7 @@ const {
   loginUser,
   logoutUser,
   updatePasswordUser,
-  getUserInfo,
+  profileUser,
 } = require('../services/authService');
 
 exports.register = async (req, res) => {
@@ -11,11 +11,11 @@ exports.register = async (req, res) => {
     const user = await registerUser(req.body);
     res.sendSuccess(201, user, '注册成功');
   } catch (error) {
-    res.sendFail(400, null, '注册失败');
+    res.sendFail(400, null, error.message);
   }
 };
 
-exports.login = async () => {
+exports.login = async (req, res) => {
   try {
     const data = await loginUser(req.body.username, req.body.password);
     res.sendSuccess(200, data, '登录成功');
@@ -34,13 +34,13 @@ exports.logout = async () => {
 exports.getInfo = async (req, res) => {
   try {
     const userId = req.user.id;
-    const info = await getUserInfo(userId);
+    const info = await profileUser(userId);
     res.sendSuccess(200, info, '获取用户信息成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
 };
-exports.updatePassword = async (res, req) => {
+exports.updatePassword = async (req, res) => {
   try {
     const { oldPwd, newPwd } = req.body;
     await updatePasswordUser(req.user.id, oldPwd, newPwd);
