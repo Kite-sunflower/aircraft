@@ -21,7 +21,7 @@ exports.protect = async (req, res, next) => {
     //查询用户
     const user = await User.findById(decoded.id);
     if (!user) {
-      return res.sendFail(401, null, '用户不存在');
+      return res.sendFail(401, null, '用户不存在或已被删除！');
     }
 
     // 把用户信息挂载到 req

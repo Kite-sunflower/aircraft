@@ -6,7 +6,7 @@ async function pagination(Model, page = 1, limit = 10, sortObj = { createdAt: -1
 
   const data = await Model.find().sort(sortObj).skip(skip).limit(limit);
 
-  const total = await Model.countdocument();
+  const total = await Model.countDocuments();
 
   const pages = Math.ceil(total / limit);
   return {

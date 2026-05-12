@@ -12,7 +12,7 @@ const {
 exports.getAllUser = async (req, res) => {
   try {
     const { page } = req.query;
-    const items = await getAll(page, limit);
+    const items = await getAll(page);
     res.sendSuccess(200, items, '获取用户列表');
   } catch (error) {
     res.sendFail(400, null, error.message);
@@ -38,13 +38,13 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const updateData = update(req.params.id, req.body);
+    const updateData = await update(req.params.id, req.body);
     res.sendSuccess(200, updateData, '更新用户成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
 };
-exports.deleteUser = async (res, req) => {
+exports.deleteUser = async (req, res) => {
   try {
     await deleteId(req.params.id);
     res.sendSuccess(200, null, '删除用户成功');
@@ -52,7 +52,7 @@ exports.deleteUser = async (res, req) => {
     res.sendFail(400, null, error.message);
   }
 };
-exports.deleteBatchUser = async (res, req) => {
+exports.deleteBatchUser = async (req, res) => {
   try {
     const { ids } = req.body;
     await deleteBatch(ids);
@@ -64,7 +64,7 @@ exports.deleteBatchUser = async (res, req) => {
 
 exports.roleSetupUser = async (req, res) => {
   try {
-    const roleUser = roleSetup(req.params.id, req.params.role);
+    const roleUser = await roleSetup(req.params.id, req.body.role);
     res.sendSuccess(201, roleUser, '用户角色修改成功');
   } catch (error) {
     res.sendFail(400, null, error.message);

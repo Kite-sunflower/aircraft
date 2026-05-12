@@ -7,7 +7,7 @@ exports.getAll = async (page) => {
 };
 exports.getOne = async (id) => {
   const user = await User.findById(id);
-  if (!user) throw new Error('用户不存在');
+  if (!user) throw new Error('查询用户不存在');
   return user;
 };
 
@@ -18,7 +18,7 @@ exports.create = async (userData) => {
 
   const user = await User.findOne({ username });
 
-  if (user) throw new Error('用户已存在');
+  if (user) throw new Error('创建的用户已存在');
 
   return await User.create({
     username: username,
@@ -26,16 +26,19 @@ exports.create = async (userData) => {
   });
 };
 exports.update = async (id, updateDate) => {
-  const user = User.findById(id);
-  if (!user) throw new Error('用户不存在');
-  await User.findByIdAndUpdate(id, updateDate, {
+  const user = await User.findById(id);
+  if (!user) throw new Error('更新的用户不存在');
+  const updateUser = await User.findByIdAndUpdate(id, updateDate, {
     new: true,
     runValidators: true,
   });
+  return updateUser;
 };
 exports.deleteId = async (id) => {
-  const user = User.findById(id);
-  if (!user) throw new Error('用户不存在');
+  const user = await User.findById(id);
+  if (!user) throw new Error('删除的用户不存在');
+  if (user.role === 'admin') throw new Error('禁止删除管理员');
+
   await User.findByIdAndDelete(id);
   return true;
 };
@@ -52,7 +55,8 @@ exports.deleteBatch = async (ids) => {
 
 exports.roleSetup = async (id, role) => {
   const user = await User.findById(id);
-  if (!user) throw new Error('用户不存在');
+  if (!user) throw new Error('修改角色的用户不存在');
+  console.log(role);
   if (!['admin', 'toolDist', 'materialsDist', 'worker'].includes(role)) throw new Error('非法角色');
 
   user.role = role;
