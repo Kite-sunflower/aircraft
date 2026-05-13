@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const materialSchema = mongoose.Schema(
   {
@@ -12,7 +12,7 @@ const materialSchema = mongoose.Schema(
     },
     distributor: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       default: null,
     },
     usedQuantity: {
@@ -21,19 +21,14 @@ const materialSchema = mongoose.Schema(
     },
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       default: null,
     },
     receiveTime: {
       type: Date,
       default: null,
     },
-    status: {
-      type: String,
-      enum: ["able", "disable"],
-      default: "able",
-    },
   },
   { timestamps: true }
 );
-module.exports = mongoose.model("Material", materialSchema);
+module.exports = mongoose.model('Material', materialSchema);

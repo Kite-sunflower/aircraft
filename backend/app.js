@@ -14,7 +14,7 @@ const authRouter = require('./src/routes/authRoute');
 const userRoute = require('./src/routes/userRoute');
 const toolRouter = require('./src/routes/toolRoute');
 const taskRouter = require('./src/routes/taskRoute');
-const materialsRouter = require('./src/routes/authRoute');
+const materialsRouter = require('./src/routes/materialsRoute');
 
 const app = express();
 

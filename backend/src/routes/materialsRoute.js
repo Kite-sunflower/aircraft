@@ -1,4 +1,4 @@
-const express = reqiure('express');
+const express = require('express');
 const router = express.Router();
 const {
   getAllMaterials,
@@ -7,20 +7,18 @@ const {
   updateMaterials,
   deleteMaterials,
   deleteBatchMaterials,
-  receiveMaterials,
-  statusMaterials,
-} = require('../controllers/materialsControlller');
+  dealMaterials,
+} = require('../controllers/materalsController');
 
 const { protect, admin, materialsDist } = require('../middleware/auth');
 
 router.delete('/batch/delete', protect, admin, deleteBatchMaterials);
 router.get('/', protect, getAllMaterials);
 router.get('/:id', protect, getOneMaterials);
-router.post('/create', protect, materialsDist, createMaterials);
+router.post('/create', protect, admin, createMaterials);
 router.put('/:id/update', protect, materialsDist, updateMaterials);
 router.delete('/:id/delete', protect, admin, deleteMaterials);
 
-router.post('/:id', protect, receiveMaterials);
-router.post('/:id/update', materialsDist, statusMaterials);
+router.post('/:id/deal', protect, dealMaterials);
 
 module.exports = router;

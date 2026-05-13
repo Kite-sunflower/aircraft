@@ -5,9 +5,9 @@ const {
   update,
   deleteId,
   deleteBatch,
-  receive,
+  deal,
   status,
-} = require('../services/taskService');
+} = require('../services/materialsService');
 
 exports.getAllMaterials = async (req, res) => {
   try {
@@ -44,7 +44,7 @@ exports.updateMaterials = async (req, res) => {
 };
 exports.deleteMaterials = async (req, res) => {
   try {
-    await deleteId();
+    await deleteId(req.params.id);
     res.sendSuccess(200, null, '删除材料成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
@@ -60,23 +60,16 @@ exports.deleteBatchMaterials = async (req, res) => {
   }
 };
 //核心逻辑
-exports.statusMaterials = async (req, res) => {
-  try {
-    const result = await status(req.params.id, req.body.status);
-    res.sendSuccess(200, result, '更改材料状态成功');
-  } catch (error) {
-    res.sendFail(400, null, error.message);
-  }
-};
-exports.receiveMaterials = async (req, res) => {
+
+exports.dealMaterials = async (req, res) => {
   try {
     const materialsId = req.params.id;
     const { userId, quantity } = req.body;
 
     const distributorId = req.user._id;
 
-    const result = await receive(materialsId, userId, quantity, distributorId);
-    res.sendSuccess(200, result, '领取材料成功');
+    const result = await deal(materialsId, userId, quantity, distributorId);
+    res.sendSuccess(200, result, '发送材料成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
