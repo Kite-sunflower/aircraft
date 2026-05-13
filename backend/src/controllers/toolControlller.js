@@ -45,7 +45,7 @@ exports.updateTool = async (req, res) => {
 };
 exports.deleteTool = async (req, res) => {
   try {
-    await deleteId();
+    await deleteId(req.params.id);
     res.sendSuccess(200, null, '删除工具成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
@@ -62,8 +62,8 @@ exports.deleteBatchTool = async (req, res) => {
 };
 exports.statusSetupTool = async (req, res) => {
   try {
-    await statusSetup(req.params.id, req.params.status);
-    res.sendSuccess(200, null, '工具状态修改成功');
+    const data = await statusSetup(req.params.id, req.body.status);
+    res.sendSuccess(200, data, '工具状态修改成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

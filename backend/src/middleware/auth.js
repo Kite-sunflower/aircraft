@@ -38,13 +38,13 @@ exports.admin = (req, res, next) => {
   next();
 };
 exports.toolDist = (req, res, next) => {
-  if (req.user.role !== 'admin' || req.user.role !== 'toolDist') {
+  if (req.user.role !== 'admin' && req.user.role !== 'toolDist') {
     return res.sendFail(403, null, '权限不足,仅管理员和工具管理员可操作');
   }
   next();
 };
 exports.materialsDist = (req, res, next) => {
-  if (req.user.role !== 'admin' || req.user.role !== 'materialsDist') {
+  if (req.user.role !== 'admin' && req.user.role !== 'materialsDist') {
     return res.sendFail(403, null, '权限不足,仅管理员和材料管理员可操作');
   }
   next();

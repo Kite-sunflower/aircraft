@@ -13,17 +13,18 @@ exports.getOne = async (id) => {
 exports.create = async (toolData) => {
   const { name, stock } = toolData;
   if (!name || !stock) throw new Error('名字和库存不能为空');
-  const tool = Tool.findOne({ name });
+  const tool = await Tool.findOne({ name });
   if (tool) throw new Error('工具已存在');
-  await Tool.create({ ...toolData });
+  return await Tool.create(toolData);
 };
 exports.update = async (id, updataDate) => {
   const tool = await Tool.findById(id);
   if (!tool) throw new Error('工具不存在');
-  await Tool.findByIdAndUpdate(id, updataDate, {
+  const result = await Tool.findByIdAndUpdate(id, updataDate, {
     new: true,
     runValidators: true,
   });
+  return result;
 };
 exports.deleteId = async (id) => {
   const tool = await Tool.findById(id);
@@ -32,7 +33,8 @@ exports.deleteId = async (id) => {
   return true;
 };
 exports.deleteBatch = async (ids) => {
-  if (Array.isArray(ids) || ids.length === 0) throw new Error('请选择删除的数据');
+  console.log(ids);
+  if (!Array.isArray(ids) || ids.length === 0) throw new Error('请选择删除的数据');
 
   const list = await Tool.find({ _id: { $in: ids } });
   if (list.length !== ids.length) throw new Error('部分数据不存在');
@@ -46,7 +48,7 @@ exports.deleteBatch = async (ids) => {
 exports.statusSetup = async (id, status) => {
   const tool = await Tool.findById(id);
   if (!tool) throw new Error('工具不存在');
-
+  if (!['available', 'repair', 'borrowed'].includes(status)) throw new Error('非法状态修改');
   tool.status = status;
   await tool.save();
   return tool;

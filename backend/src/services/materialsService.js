@@ -15,7 +15,7 @@ exports.create = async (materialsData) => {
   if (!name || !stock) throw new Error('名字和库存不能为空');
   const materials = Materials.findOne({ name });
   if (materials) throw new Error('材料已存在');
-  await Materials.create({ ...materialsData });
+  return await Materials.create(materialsData);
 };
 exports.update = async (id, updataDate) => {
   const materials = await Materials.findById(id);

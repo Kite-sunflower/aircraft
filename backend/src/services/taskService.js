@@ -16,7 +16,7 @@ exports.create = async (taskData) => {
   if (!title || !desc) throw new Error('任务和描述不能为空');
   const task = Task.findOne({ task });
   if (task) throw new Error('任务已存在');
-  await Task.create({ ...taskData });
+  return await Task.create(taskData);
 };
 
 exports.update = async (id, updataDate) => {
