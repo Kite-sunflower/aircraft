@@ -4,13 +4,25 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: [true, '用户名不能为空'],
+      minlength: [2, '用户名最少2个字符'],
+      maxlength: [6, '用户名最多6个字符'],
       unique: true,
       trim: true,
+      // 只允许中文、英文、数字
+      match: [/^[\u4e00-\u9fa5a-zA-Z0-9]+$/, '用户名不能包含特殊符号或空格'],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, '密码不能为空'],
+      minlength: [4, '密码最少4位'],
+      maxlength: [8, '密码最多8位'],
+      validate: {
+        validator: function (v) {
+          return /^(?=.*[A-Za-z])(?=.*\d)/.test(v);
+        },
+        message: '密码必须包含字母和数字',
+      },
       select: false,
     },
     role: {

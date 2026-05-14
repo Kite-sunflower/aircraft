@@ -16,6 +16,8 @@ exports.create = async (userData) => {
 
   if (!username || !password) throw new Error('用户名和密码不能为空');
 
+  if (username === password) throw new Error('密码不能和用户名相同');
+
   const user = await User.findOne({ username });
 
   if (user) throw new Error('创建的用户已存在');
@@ -25,13 +27,23 @@ exports.create = async (userData) => {
     password: password,
   });
 };
-exports.update = async (id, updateDate) => {
+exports.update = async (id, updateData) => {
   const user = await User.findById(id);
   if (!user) throw new Error('更新的用户不存在');
-  const updateUser = await User.findByIdAndUpdate(id, updateDate, {
+
+  // 如果更新里包含密码，才校验“密码不能和用户名相同”
+  if (updateData.password) {
+    // 注意：这里要判断【新密码】和【用户名】是否一样！
+    if (updateData.password === user.username) {
+      throw new Error('密码不能和用户名相同');
+    }
+  }
+
+  const updateUser = await User.findByIdAndUpdate(id, updateData, {
     new: true,
     runValidators: true,
   });
+
   return updateUser;
 };
 exports.deleteId = async (id) => {
