@@ -5,7 +5,6 @@ const {
   update,
   deleteId,
   deleteBatch,
-  statusSetup,
   distribute,
   accept,
   finish,
@@ -29,8 +28,8 @@ exports.getOneTask = async (req, res) => {
 };
 exports.createTask = async (req, res) => {
   try {
-    const newTool = await create(req.body);
-    res.sendSuccess(200, newTool, '创建任务成功');
+    const newTask = await create(req.body);
+    res.sendSuccess(200, newTask, '创建任务成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
@@ -45,7 +44,7 @@ exports.updateTask = async (req, res) => {
 };
 exports.deleteTask = async (req, res) => {
   try {
-    await deleteId();
+    await deleteId(req.params.id);
     res.sendSuccess(200, null, '删除任务成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
@@ -65,7 +64,7 @@ exports.deleteBatchTask = async (req, res) => {
 
 exports.distributeTask = async (req, res) => {
   try {
-    const result = await distribute(req.params.id, req.user._id);
+    const result = await distribute(req.params.id, req.body.accepterId, req.user._id);
     res.sendSuccess(200, result, '分配成功');
   } catch (error) {
     res.sendFail(400, null, error.message);

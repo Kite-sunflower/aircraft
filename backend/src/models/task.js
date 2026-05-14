@@ -12,7 +12,7 @@ const taskSchema = new mongoose.Schema(
     distributor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      default: null,
     },
     accepter: {
       type: mongoose.Schema.Types.ObjectId,
@@ -29,7 +29,7 @@ const taskSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'doing', 'finished'],
+      enum: ['pending', 'doing', 'finish'],
       default: 'pending',
     },
   },
