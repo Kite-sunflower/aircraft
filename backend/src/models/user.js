@@ -15,8 +15,6 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, '密码不能为空'],
-      minlength: [4, '密码最少4位'],
-      maxlength: [8, '密码最多8位'],
       validate: {
         validator: function (v) {
           return /^(?=.*[A-Za-z])(?=.*\d)/.test(v);
@@ -27,7 +25,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'toolDist', 'materialsDist', 'worker'],
+      enum: ['admin', 'worker', 'toolDist', 'materialsDist'],
       default: 'worker',
     },
   },

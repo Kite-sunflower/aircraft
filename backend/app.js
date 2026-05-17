@@ -32,6 +32,10 @@ app.use('/api/tool', toolRouter);
 app.use('/api/task', taskRouter);
 app.use('/api/materials', materialsRouter);
 
+app.get('/test', (req, res) => {
+  res.send('后端接口成功');
+});
+
 app.use(notFound);
 app.use(errorhandler);
 

@@ -6,7 +6,6 @@ const {
   deleteId,
   deleteBatch,
   deal,
-  status,
 } = require('../services/materialsService');
 
 exports.getAllMaterials = async (req, res) => {
