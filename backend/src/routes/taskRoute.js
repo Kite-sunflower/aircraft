@@ -8,21 +8,19 @@ const {
   deleteTask,
   deleteBatchTask,
   distributeTask,
-  acceptTask,
   finishTask,
 } = require('../controllers/taskController');
 
 const { protect, admin } = require('../middleware/auth');
 
-router.delete('/batch/delete', protect, admin, deleteBatchTask);
+router.post('/batch/delete', protect, admin, deleteBatchTask);
 router.get('/', protect, getAllTask);
 router.get('/:id', protect, getOneTask);
 router.post('/create', protect, admin, createTask);
 router.put('/:id/update', protect, admin, updateTask);
 router.delete('/:id/delete', protect, admin, deleteTask);
 
-router.post('/:id/distribute', protect, admin, distributeTask);
-router.post('/:id/accept', protect, acceptTask);
-router.post('/:id/finish', protect, finishTask);
+router.put('/:id/distribute', protect, admin, distributeTask);
+router.put('/:id/finish', protect, finishTask);
 
 module.exports = router;

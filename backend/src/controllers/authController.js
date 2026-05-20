@@ -23,7 +23,7 @@ exports.login = async (req, res) => {
     res.sendFail(400, null, error.message);
   }
 };
-exports.logout = async () => {
+exports.logout = async (req, res) => {
   try {
     await logoutUser();
     res.sendSuccess(200, null, '退出成功');

@@ -8,25 +8,13 @@ const materialSchema = mongoose.Schema(
     },
     stock: {
       type: Number,
-      default: 1,
-    },
-    distributor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: null,
-    },
-    usedQuantity: {
-      type: Number,
+      min: 0,
       default: 0,
     },
-    receiver: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: null,
-    },
-    receiveTime: {
-      type: Date,
-      default: null,
+    availableStock: {
+      type: Number,
+      min: 0,
+      default: 0,
     },
   },
   { timestamps: true }

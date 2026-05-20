@@ -5,31 +5,36 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    desc: {
+    description: {
       type: String,
       required: true,
     },
-    distributor: {
+    creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       default: null,
     },
-    accepter: {
+    manager: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       default: null,
     },
-    acceptTime: {
+    worker: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    assignedAt: {
       type: Date,
       default: null,
     },
-    finishTime: {
+    finishedAt: {
       type: Date,
-      dafault: null,
+      default: null,
     },
     status: {
       type: String,
-      enum: ['pending', 'doing', 'finish'],
+      enum: ['pending', 'doing', 'finished'],
       default: 'pending',
     },
   },

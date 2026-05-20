@@ -17,13 +17,8 @@ exports.create = async (userData) => {
   const { username, password } = userData;
 
   // 非空校验
-  if (!username || !password) {
+  if (!username?.trim() || !password?.trim()) {
     throw new Error('用户名和密码不能为空');
-  }
-
-  // 密码长度
-  if (password.length < 4 || password.length > 8) {
-    throw new Error('密码长度为4-8位');
   }
 
   // 密码不能等于用户名
@@ -45,12 +40,7 @@ exports.create = async (userData) => {
   });
 };
 exports.update = async (id, updateData) => {
-  const user = await User.findById(id);
-  if (!user) {
-    throw new Error('更新的用户不存在');
-  }
-
-  /// 禁止通过普通更新接口修改密码
+  // 禁止通过普通更新接口修改密码
   if (updateData.password) {
     throw new Error('请使用修改密码接口');
   }
@@ -59,6 +49,10 @@ exports.update = async (id, updateData) => {
     new: true,
     runValidators: true,
   });
+
+  if (!updateUser) {
+    throw new Error('更新的用户不存在');
+  }
 
   return updateUser;
 };
@@ -96,8 +90,7 @@ exports.roleSetup = async (id, role) => {
   if (!user) {
     throw new Error('修改角色的用户不存在');
   }
-  console.log(role);
-  if (!['admin', 'toolDist', 'materialsDist', 'worker'].includes(role)) {
+  if (!['admin', 'toolManager', 'materialManager', 'worker'].includes(role)) {
     throw new Error('非法角色');
   }
 

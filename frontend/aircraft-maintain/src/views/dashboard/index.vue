@@ -39,9 +39,27 @@
         </template>
 
         <el-table :data="tableData" style="width: 100%">
+          <el-table-column
+            prop="_id"
+            label="ID"
+            width="180"
+            show-overflow-tooltip
+          />
           <el-table-column prop="title" label="任务名称" />
-          <el-table-column prop="status" label="状态" />
-          <el-table-column prop="date" label="时间" />
+          <el-table-column label="状态">
+            <template #default="{ row }">
+              <el-tag v-if="row.status === 'pending'" type="warning">
+                待处理
+              </el-tag>
+
+              <el-tag v-else-if="row.status === 'doing'" type="primary">
+                进行中
+              </el-tag>
+
+              <el-tag v-else type="success"> 已完成 </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createdAt" label="创建时间" />
         </el-table>
       </el-card>
     </div>
@@ -49,11 +67,21 @@
 </template>
 
 <script setup>
-const tableData = [
-  { title: "检查发动机", status: "进行中", date: "2026-05-17" },
-  { title: "更换轮胎", status: "已完成", date: "2026-05-16" },
-  { title: "系统巡检", status: "待处理", date: "2026-05-15" },
-];
+import { ref, onMounted } from "vue";
+import { getTaskList } from "@/api/task";
+
+const tableData = ref([]);
+
+const fetchTasks = async () => {
+  const list = await getTaskList();
+
+  // 只取最近10条
+  tableData.value = list.slice(0, 10);
+};
+
+onMounted(() => {
+  fetchTasks();
+});
 </script>
 
 <style scoped>

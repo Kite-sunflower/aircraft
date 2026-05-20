@@ -17,112 +17,248 @@
             clearable
             style="width: 160px"
           >
+            <el-option label="出借" value="borrowed" />
             <el-option label="可用" value="available" />
             <el-option label="维修" value="repair" />
-            <el-option label="借出" value="borrowed" />
           </el-select>
 
-          <el-button type="primary"> 搜索 </el-button>
+          <el-button type="primary" @click="handleSearch"> 搜索 </el-button>
 
-          <el-button> 重置 </el-button>
+          <el-button @click="handleReset"> 重置 </el-button>
         </div>
 
         <div class="right">
-          <el-button type="danger"> 批量删除 </el-button>
+          <el-button
+            type="danger"
+            @click="handleBatchDelete"
+            :disabled="!selectedIds.length"
+          >
+            批量删除
+          </el-button>
 
-          <el-button type="primary"> 新建工具 </el-button>
+          <el-button type="primary" @click="handleCreate"> 新建工具 </el-button>
         </div>
       </div>
     </el-card>
-
-    <!-- 表格区域 -->
     <el-card>
-      <el-table
+      <!-- 表格 -->
+      <CrudTable
         :data="tableData"
-        border
-        style="width: 100%"
+        :columns="columns"
+        :loading="loading"
+        :pagination="pagination"
+        empty-text="暂无工具数据"
+        @page-change="handlePageChange"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
+        <!-- 状态 -->
+        <template #status="{ row }">
+          <el-tag v-if="row.status === 'borrowed'" type="warning">
+            出借
+          </el-tag>
 
-        <el-table-column prop="name" label="工具名称" min-width="180" />
+          <el-tag v-else-if="row.status === 'available'" type="primary">
+            可用
+          </el-tag>
 
-        <el-table-column prop="stock" label="库存数量" min-width="220" />
+          <el-tag v-else type="warning"> 维修 </el-tag>
+        </template>
 
-        <el-table-column prop="status" label="工具状态" width="120">
-          <template #default="{ row }">
-            <el-tag v-if="row.status === 'available'" type="success">
-              可用
-            </el-tag>
-
-            <el-tag v-else-if="row.status === 'repair'" type="primary">
-              维修
-            </el-tag>
-
-            <el-tag v-else type="warning"> 借出 </el-tag>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="createdAt" label="创建时间" width="180" />
-
-        <el-table-column label="操作" width="240" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link> 编辑 </el-button>
-
-            <el-button v-if="row.status != 'borrowed'" type="success" link>
-              借用
+        <!-- 操作 -->
+        <template #action="{ row }">
+          <div class="table-actions">
+            <el-button type="primary" link @click="handleEdit(row)">
+              编辑
             </el-button>
-            <el-button v-else type="warning" link> 归还 </el-button>
 
-            <el-button type="danger" link> 删除 </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+            <el-button type="success" link @click="handleBorrow(row)">
+              出借
+            </el-button>
 
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          background
-          layout="total, prev, pager, next"
-          :total="100"
-        />
-      </div>
+            <el-button type="warning" link @click="handleReturn(row)">
+              归还
+            </el-button>
+
+            <el-button type="info" link @click="handleView(row)">
+              查看
+            </el-button>
+
+            <el-button type="danger" link @click="handleDelete(row._id)">
+              删除
+            </el-button>
+          </div>
+        </template>
+      </CrudTable>
     </el-card>
   </div>
+  <!-- 新增/编辑弹窗 -->
+  <el-dialog
+    v-model="dialogVisible"
+    :title="isEdit ? '编辑工具' : '新建工具'"
+    width="500px"
+    @close="handleCloseDialog"
+  >
+    <el-form ref="formRef" :model="formData" :rules="rules" label-width="80px">
+      <el-form-item label="工具名称" prop="name">
+        <el-input v-model="formData.name" placeholder="请输入工具名称" />
+      </el-form-item>
+
+      <el-form-item label="库存" prop="stock">
+        <el-input-number
+          v-model="formData.stock"
+          :min="0"
+          style="width: 100%"
+        />
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="formData.status" style="width: 100%">
+          <el-option label="可用" value="available" />
+          <el-option label="维修" value="repair" />
+          <el-option label="出借" value="borrowed" />
+        </el-select>
+      </el-form-item>
+    </el-form>
+
+    <template #footer>
+      <el-button @click="handleCloseDialog"> 取消 </el-button>
+
+      <el-button type="primary" @click="handleSubmit" :loading="submitLoading">
+        确定
+      </el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { onMounted } from "vue";
+import CrudTable from "@/components/CrudTable/index.vue";
+import {
+  getToolList,
+  deleteTool,
+  batchDeleteTool,
+  createTool,
+  updateTool,
+} from "@/api/tool";
+import { useCrud } from "@/composables/useCrud";
+import { useDialog } from "@/composables/useDialog";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
-const searchForm = reactive({
-  keyword: "",
-  status: "",
-});
-const selectedIds = ref([]);
-
-const handleSelectionChange = (rows) => {
-  selectedIds.value = rows.map((item) => item._id);
+const handleView = (row) => {
+  router.push(`/tool/detail/${row._id}`);
 };
-const tableData = ref([
-  {
-    name: "螺丝刀",
-    stock: 1,
+const handleBorrow = (row) => {
+  router.push(`/tool/borrow/${row._id}`);
+};
+const handleReturn = (row) => {
+  router.push(`/tool/return/${row._id}`);
+};
+const {
+  loading,
+  tableData,
+  selectedIds,
+  pagination,
+  searchForm,
+
+  fetchList,
+  handlePageChange,
+  handleDelete,
+  handleBatchDelete,
+  handleSelectionChange,
+  handleSearch,
+  handleReset,
+} = useCrud({
+  getList: getToolList,
+  deleteItem: deleteTool,
+  batchDelete: batchDeleteTool,
+  searchConfig: ["name", "status"],
+});
+const rules = {
+  name: [
+    {
+      required: true,
+      message: "请输入工具名称",
+      trigger: "blur",
+    },
+  ],
+  stock: [
+    {
+      required: true,
+      message: "请输入库存",
+      trigger: "blur",
+    },
+  ],
+  status: [
+    {
+      required: true,
+      message: "请选择工具状态",
+      trigger: "change",
+    },
+  ],
+};
+
+const {
+  dialogVisible,
+  isEdit,
+  submitLoading,
+
+  formData,
+  formRef,
+
+  handleCloseDialog,
+  handleCreate,
+  handleEdit,
+  handleSubmit,
+} = useDialog({
+  defaultForm: {
+    _id: "",
+    name: "",
+    stock: 0,
     status: "available",
-    createdAt: "2026-05-17",
+  },
+
+  rules,
+
+  createApi: createTool,
+
+  updateApi: updateTool,
+
+  fetchList,
+});
+const columns = [
+  {
+    prop: "_id",
+    label: "ID",
+    width: 120,
   },
   {
-    name: "千斤顶",
-    stock: 1,
-    status: "repair",
-    createdAt: "2026-05-16",
+    prop: "name",
+    label: "工具名称",
+    minWidth: 180,
   },
+
   {
-    name: "液压车",
-    stock: 1,
-    status: "borrowed",
-    createdAt: "2026-05-15",
+    prop: "stock",
+    label: "库存",
+    minWidth: 180,
   },
-]);
+
+  {
+    prop: "status",
+    label: "工具状态",
+    width: 120,
+    slot: "status",
+  },
+
+  {
+    prop: "createdAt",
+    label: "创建时间",
+    width: 180,
+  },
+];
+onMounted(() => {
+  fetchList();
+});
 </script>
 
 <style scoped>
@@ -154,5 +290,11 @@ const tableData = ref([
   justify-content: flex-end;
 
   margin-top: 20px;
+}
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 </style>

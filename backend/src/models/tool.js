@@ -8,43 +8,18 @@ const toolSchema = new mongoose.Schema(
     stock: {
       type: Number,
       required: true,
-      default: 1,
-    },
-    distributor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: null,
-    },
-    collector: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: null,
-    },
-    borrower: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: null,
-    },
-    usedQuantity: {
-      type: Number,
+      min: 0,
       default: 0,
     },
-    returner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: null,
-    },
-    borrowTime: {
-      type: Date,
-      default: null,
-    },
-    returnTime: {
-      type: Date,
-      default: null,
+    availableStock: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
     },
     status: {
       type: String,
-      enum: ['available', 'repair', 'borrowed'],
+      enum: ['available', 'repair'],
       default: 'available',
     },
   },

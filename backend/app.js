@@ -14,7 +14,11 @@ const authRouter = require('./src/routes/authRoute');
 const userRoute = require('./src/routes/userRoute');
 const toolRouter = require('./src/routes/toolRoute');
 const taskRouter = require('./src/routes/taskRoute');
-const materialsRouter = require('./src/routes/materialsRoute');
+const materialRouter = require('./src/routes/materialRoute');
+
+//接口文档
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 
 const app = express();
 
@@ -30,7 +34,9 @@ app.use('/api/auth', authRouter);
 app.use('/api/user', userRoute);
 app.use('/api/tool', toolRouter);
 app.use('/api/task', taskRouter);
-app.use('/api/materials', materialsRouter);
+app.use('/api/material', materialRouter);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/test', (req, res) => {
   res.send('后端接口成功');

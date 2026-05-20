@@ -20,5 +20,5 @@ router.post('/create', protect, admin, createUser);
 router.put('/:id/update', protect, onlySelf, updateUser);
 router.delete('/:id/delete', protect, admin, deleteUser);
 
-router.put('/:id/updateRole', protect, admin, roleSetupUser);
+router.put('/:id/role', protect, admin, roleSetupUser);
 module.exports = router;

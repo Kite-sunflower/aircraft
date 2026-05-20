@@ -22,6 +22,7 @@
         <el-form-item prop="password">
           <el-input
             v-model="loginForm.password"
+            type="password"
             placeholder="请输入密码"
             show-password
             size="large"
@@ -45,7 +46,12 @@
 
 <script setup>
 import { reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
 import { loginApi } from "@/api/auth";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/store/modules/user";
+const router = useRouter();
+const userStore = useUserStore();
 const loginForm = reactive({
   username: "",
   password: "",
@@ -93,13 +99,18 @@ const rules = {
 
 //登录
 const handleLogin = async () => {
-  // 先校验表单
   await loginFormRef.value.validate();
+
   try {
     const res = await loginApi(loginForm);
-    console.log(res);
+
+    userStore.setUserInfo(res.data.token, res.data.userInfo);
+
+    ElMessage.success("登录成功");
+
+    router.push("/");
   } catch (error) {
-    console.log(error);
+    ElMessage.error(error.response?.data?.message || "登录失败");
   }
 };
 </script>

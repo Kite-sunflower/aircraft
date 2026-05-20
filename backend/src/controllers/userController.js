@@ -1,4 +1,3 @@
-const { deleteMany } = require('../models/task');
 const {
   getAll,
   getOne,
@@ -65,7 +64,7 @@ exports.deleteBatchUser = async (req, res) => {
 exports.roleSetupUser = async (req, res) => {
   try {
     const roleUser = await roleSetup(req.params.id, req.body.role);
-    res.sendSuccess(201, roleUser, '用户角色修改成功');
+    res.sendSuccess(200, roleUser, '用户角色修改成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

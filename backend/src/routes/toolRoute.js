@@ -8,21 +8,20 @@ const {
   deleteTool,
   deleteBatchTool,
   statusSetupTool,
-  borrowTool,
-  returnTool,
-} = require('../controllers/toolControlller');
-
-const { protect, admin, toolDist } = require('../middleware/auth');
+} = require('../controllers/toolController');
+const { borrowToolRecord, returnToolRecord } = require('../controllers/toolBorrowController');
+const { protect, admin, toolManager } = require('../middleware/auth');
 
 router.delete('/batch/delete', protect, admin, deleteBatchTool);
 router.get('/', protect, getAllTool);
 router.get('/:id', protect, getOneTool);
 router.post('/create', protect, admin, createTool);
-router.put('/:id/update', protect, toolDist, updateTool);
+router.put('/:id/update', protect, toolManager, updateTool);
 router.delete('/:id/delete', protect, admin, deleteTool);
 
-router.put('/:id/updateStatus', protect, toolDist, statusSetupTool);
-router.post('/:id/borrow', protect, toolDist, borrowTool);
-router.post('/:id/return', protect, returnTool);
+router.put('/:id/status', protect, toolManager, statusSetupTool);
+
+router.post('/:id/borrow', protect, toolManager, borrowToolRecord);
+router.post('/:id/return', protect, returnToolRecord);
 
 module.exports = router;

@@ -16,7 +16,7 @@ exports.protect = async (req, res, next) => {
     }
 
     //解密 token（你之前用的是 userId，要对应 login 里的 sign 内容）
-    const decoded = jwt.verify(token, process.env.JWT_SERECT || 'myserectkey');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'mysecretkey');
 
     //查询用户
     const user = await User.findById(decoded.id);
@@ -37,19 +37,19 @@ exports.admin = (req, res, next) => {
   }
   next();
 };
-exports.toolDist = (req, res, next) => {
-  if (req.user.role !== 'admin' && req.user.role !== 'toolDist') {
+exports.toolManager = (req, res, next) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'toolManager') {
     return res.sendFail(403, null, '权限不足,仅管理员和工具管理员可操作');
   }
   next();
 };
-exports.materialsDist = (req, res, next) => {
-  if (req.user.role !== 'admin' && req.user.role !== 'materialsDist') {
+exports.materialManager = (req, res, next) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'materialManager') {
     return res.sendFail(403, null, '权限不足,仅管理员和材料管理员可操作');
   }
   next();
 };
-exports.onlySelf = async (req, res, next) => {
+exports.onlySelf = (req, res, next) => {
   const loginUserId = req.user._id.toString();
   const targetId = req.params.id;
 

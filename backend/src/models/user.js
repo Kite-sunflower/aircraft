@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, '用户名不能为空'],
       minlength: [2, '用户名最少2个字符'],
-      maxlength: [6, '用户名最多6个字符'],
+      maxlength: [10, '用户名最多6个字符'],
       unique: true,
       trim: true,
       // 只允许中文、英文、数字
@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, '密码不能为空'],
+      minlength: [6, '密码至少6位'],
       validate: {
         validator: function (v) {
           return /^(?=.*[A-Za-z])(?=.*\d)/.test(v);
@@ -25,19 +26,25 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'worker', 'toolDist', 'materialsDist'],
+      enum: ['admin', 'worker', 'toolManager', 'materialManager'],
       default: 'worker',
+    },
+    status: {
+      type: String,
+      enum: ['active', 'disabled'],
+      default: 'active',
     },
   },
   { timestamps: true }
 );
 
-userSchema.pre('save', async function () {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
-    return;
+    return next();
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 userSchema.methods.matchPassword = async function (enterPwd) {

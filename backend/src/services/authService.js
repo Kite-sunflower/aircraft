@@ -23,7 +23,7 @@ exports.loginUser = async (username, password) => {
   //生成token
   const token = jwt.sign(
     { id: user.id, username: user.username },
-    process.env.JWT_SERECT || 'myserectkey',
+    process.env.JWT_SECRET || 'mysecretkey',
     { expiresIn: '7d' }
   );
   const userInfo = user.toObject();
@@ -56,9 +56,6 @@ exports.updatePasswordUser = async (userId, oldPwd, newPwd) => {
   const isMatch = await bcrypt.compare(oldPwd, user.password);
   if (!isMatch) {
     throw new Error('旧密码错误');
-  }
-  if (newPwd.length < 4 || newPwd.length > 8) {
-    throw new Error('密码长度为4-8位');
   }
 
   if (oldPwd === newPwd) {

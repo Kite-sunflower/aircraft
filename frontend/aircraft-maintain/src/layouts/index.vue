@@ -3,19 +3,14 @@
     <!-- 左侧菜单 -->
     <div class="sidebar">
       <div class="logo">aircraft Maintain</div>
-      <el-menu
-        router
-        background-color="#001529"
-        text-color="#fff"
-        active-text-color="#409EFF"
-        default-active="/"
-      >
-        <el-menu-item index="/">工作台</el-menu-item>
-        <el-menu-item index="/task/list"> 任务中心</el-menu-item>
-        <el-menu-item index="/tool/list">工具中心 </el-menu-item>
-        <el-menu-item index="/material/list">物料中心 </el-menu-item>
-        <el-menu-item index="/user/list">用户权限 </el-menu-item>
-        <el-menu-item index="/system">系统设置 </el-menu-item>
+      <el-menu router>
+        <el-menu-item
+          v-for="item in showMenus"
+          :key="item.path"
+          :index="item.path"
+        >
+          {{ item.title }}
+        </el-menu-item>
       </el-menu>
     </div>
 
@@ -23,15 +18,15 @@
     <div class="layout-main">
       <!-- 顶部 -->
       <div class="header">
-        <div class="header-left">工作台</div>
+        <div class="header-left">{{ pageTitle }}</div>
         <div class="header-right">
           <el-dropdown>
             <span class="dropdown-link"> Admin ▼</span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item> 个人中心 </el-dropdown-item>
-                <el-dropdown-item> 修改密码 </el-dropdown-item>
-                <el-dropdown-item divided> 退出登录 </el-dropdown-item>
+                <el-dropdown-item divided @click="handleLogout">
+                  退出登录
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -46,6 +41,79 @@
   </div>
 </template>
 
+<script setup>
+import { computed } from "vue";
+import { useUserStore } from "@/store/modules/user";
+import { ElMessageBox, ElMessage } from "element-plus";
+import { useRouter, useRoute } from "vue-router";
+
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
+const pageTitle = computed(() => {
+  return route.meta.title || "工作台";
+});
+const menus = [
+  {
+    title: "工作台",
+    path: "/",
+    roles: ["admin"],
+  },
+  {
+    title: "任务管理",
+    path: "/task/list",
+    roles: ["admin", "worker"],
+  },
+
+  {
+    title: "工具管理",
+    path: "/tool/list",
+    roles: ["admin", "toolDist"],
+  },
+
+  {
+    title: "物料管理",
+    path: "/material/list",
+    roles: ["admin", "materialsDist"],
+  },
+
+  {
+    title: "用户管理",
+    path: "/user/list",
+    roles: ["admin"],
+  },
+];
+const handleLogout = async () => {
+  try {
+    // 二次确认
+    await ElMessageBox.confirm("确认退出当前账号吗？", "退出登录", {
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      type: "warning",
+    });
+
+    // 清空本地数据
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+
+    ElMessage.success("退出成功");
+
+    // 跳转登录页
+    router.push("/login");
+  } catch (error) {
+    console.log(error);
+  }
+};
+// 当前角色
+const role = computed(() => userStore.userInfo?.role || "");
+
+// 当前用户能看到的菜单
+const showMenus = computed(() => {
+  const roleVal = role.value;
+  if (!roleVal) return [];
+  return menus.filter((item) => item.roles.includes(roleVal));
+});
+</script>
 <style scoped>
 .layout-container {
   display: flex;

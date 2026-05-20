@@ -1,0 +1,51 @@
+export let taskList = [
+  {
+    _id: "1",
+    title: "发动机检查",
+    desc: "检查发动机运行状态",
+    status: "pending",
+    createdAt: "2026-05-18",
+  },
+  {
+    _id: "2",
+    title: "机翼维修",
+    desc: "检查机翼状态",
+    status: "doing",
+    createdAt: "2026-05-17",
+  },
+  {
+    _id: "3",
+    title: "起落架检查",
+    desc: "检查起落架状态",
+    status: "pending",
+    createdAt: "2026-05-15",
+  },
+  {
+    _id: "4",
+    title: "雷达维修",
+    desc: "检查雷达系统",
+    status: "doing",
+    createdAt: "2026-05-14",
+  },
+  {
+    _id: "5",
+    title: "油路检测",
+    desc: "检查油路系统",
+    status: "finish",
+    createdAt: "2026-05-13",
+  },
+  {
+    _id: "6",
+    title: "线路检测",
+    desc: "检查线路系统",
+    status: "finish",
+    createdAt: "2026-05-13",
+  },
+  {
+    _id: "7",
+    title: "燃油添加",
+    desc: "添加燃油",
+    status: "finish",
+    createdAt: "2026-05-13",
+  },
+];
