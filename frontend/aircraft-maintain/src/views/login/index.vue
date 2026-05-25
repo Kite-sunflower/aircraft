@@ -104,8 +104,7 @@ const handleLogin = async () => {
   try {
     const res = await loginApi(loginForm);
 
-    userStore.setUserInfo(res.data.token, res.data.userInfo);
-
+    userStore.setUserInfo(res.token, res.userInfo);
     ElMessage.success("登录成功");
 
     router.push("/");

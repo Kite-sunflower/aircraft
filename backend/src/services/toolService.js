@@ -1,8 +1,9 @@
+const { populate } = require('../models/task');
 const Tool = require('../models/tool');
 const pagination = require('../utils/pagination');
 
-exports.getAll = async (page) => {
-  return await pagination(Tool, page);
+exports.getAll = async (page, limit) => {
+  return await pagination(Tool, page, limit);
 };
 
 exports.getOne = async (id) => {

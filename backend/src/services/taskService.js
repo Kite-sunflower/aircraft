@@ -2,12 +2,12 @@ const Task = require('../models/task');
 const User = require('../models/user');
 const pagination = require('../utils/pagination');
 
-exports.getAll = async (page) => {
-  return await pagination(Task, page);
+exports.getAll = async (page, limit) => {
+  return await pagination(Task, page, limit);
 };
 
 exports.getOne = async (id) => {
-  const task = await Task.findById(id);
+  const task = await Task.findById(id).populate('worker').populate('manager').populate('creator');
   if (!task) {
     throw new Error('任务不存在');
   }
@@ -81,6 +81,7 @@ exports.deleteBatch = async (ids) => {
 //分配任务
 exports.distribute = async (taskId, workerId, managerId) => {
   const task = await Task.findById(taskId);
+
   if (!task) {
     throw new Error('任务不存在');
   }

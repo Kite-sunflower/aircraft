@@ -10,8 +10,8 @@ const {
 
 exports.getAllTool = async (req, res) => {
   try {
-    const { page } = req.query;
-    const toolData = await getAll(page);
+    const { page = 1, limit = 10 } = req.query;
+    const toolData = await getAll(page, limit);
     res.sendSuccess(200, toolData, '获取工具列表成功');
   } catch (error) {
     res.sendFail(400, null, error.message);

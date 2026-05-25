@@ -1,26 +1,24 @@
-import { userList } from "@/mock/user";
-
-const delay = (time = 300) =>
-  new Promise((resolve) => setTimeout(resolve, time));
+import request from "@/utils/request";
 
 /**
  * 获取用户列表
  */
-export const getUserList = async () => {
-  await delay();
-  return userList;
+export const getUserList = async (params) => {
+  return request({
+    url: "/user",
+    method: "get",
+    params,
+  });
 };
 
 /**
  * 新增用户
  */
 export const createUser = async (data) => {
-  await delay();
-
-  userList.unshift({
-    _id: Date.now().toString(),
-    ...data,
-    createdAt: new Date().toISOString().split("T")[0],
+  return request({
+    url: "/user/create",
+    method: "post",
+    data,
   });
 };
 
@@ -28,42 +26,30 @@ export const createUser = async (data) => {
  * 更新用户
  */
 export const updateUser = async (id, data) => {
-  await delay();
-
-  const index = userList.findIndex((item) => item._id === id);
-
-  if (index !== -1) {
-    userList[index] = {
-      ...userList[index],
-      ...data,
-    };
-  }
+  return request({
+    url: `/user/${id}/update`,
+    method: "put",
+    data,
+  });
 };
 
 /**
  * 删除用户
  */
 export const deleteUser = async (id) => {
-  await delay();
-
-  const index = userList.findIndex((item) => item._id === id);
-
-  if (index !== -1) {
-    userList.splice(index, 1);
-  }
+  return request({
+    url: `/user/${id}/delete`,
+    method: "delete",
+  });
 };
 
 /**
  * 批量删除用户
  */
 export const batchDeleteUser = async (ids) => {
-  await delay();
-
-  ids.forEach((id) => {
-    const index = userList.findIndex((item) => item._id === id);
-
-    if (index !== -1) {
-      userList.splice(index, 1);
-    }
+  return request({
+    url: `/user/batch/delete`,
+    method: "post",
+    data: { ids },
   });
 };

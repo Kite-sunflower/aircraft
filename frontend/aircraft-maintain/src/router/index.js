@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-
+import { ElMessage } from "element-plus";
 import Layout from "@/layouts/index.vue";
 
 import { useUserStore } from "@/store/modules/user";
@@ -127,31 +127,27 @@ const router = createRouter({
 // 路由前置守卫
 router.beforeEach((to) => {
   const userStore = useUserStore();
+  const token = userStore.token;
 
-  // 未登录
-  if (!userStore.token) {
+  //  未登录
+  if (!token) {
     if (to.path !== "/login") {
       return "/login";
     }
-
     return true;
   }
 
-  // 已登录不能回登录页
+  // ✔ 已登录：允许访问所有页面（包括 login）
   if (to.path === "/login") {
     return "/";
   }
 
-  // 当前用户角色
-  const role = userStore.userInfo.role;
+  // 权限控制
+  const role = userStore.userInfo?.role;
+  const roles = to.meta?.roles;
 
-  // 页面允许角色
-  const roles = to.meta.roles;
-
-  // 需要权限
   if (roles && !roles.includes(role)) {
     ElMessage.error("没有访问权限");
-
     return "/";
   }
 

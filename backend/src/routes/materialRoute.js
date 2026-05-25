@@ -10,7 +10,10 @@ const {
   deleteBatchMaterial,
 } = require('../controllers/materalController');
 
-const { distributeMaterial } = require('../controllers/materialReceiveController');
+const {
+  distributeMaterial,
+  getRecordsMaterial,
+} = require('../controllers/materialReceiveController');
 const { protect, admin, materialManager } = require('../middleware/auth');
 
 router.post('/batch/delete', protect, admin, deleteBatchMaterial);
@@ -20,5 +23,7 @@ router.post('/create', protect, admin, createMaterial);
 router.put('/:id/update', protect, materialManager, updateMaterial);
 router.delete('/:id/delete', protect, admin, deleteMaterial);
 router.post('/:id/distribute', protect, distributeMaterial);
+
+router.get('/:id/materialRecord', protect, getRecordsMaterial);
 
 module.exports = router;

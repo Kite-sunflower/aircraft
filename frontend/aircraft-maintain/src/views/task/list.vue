@@ -5,7 +5,7 @@
       <div class="search-bar">
         <div class="left">
           <el-input
-            v-model="searchForm.keyword"
+            v-model="searchForm.title"
             placeholder="请输入任务名称"
             clearable
             style="width: 220px"
@@ -19,7 +19,7 @@
           >
             <el-option label="待处理" value="pending" />
             <el-option label="进行中" value="doing" />
-            <el-option label="已完成" value="finish" />
+            <el-option label="已完成" value="finished" />
           </el-select>
 
           <el-button type="primary" @click="handleSearch"> 搜索 </el-button>
@@ -61,7 +61,13 @@
             进行中
           </el-tag>
 
-          <el-tag v-else type="success"> 已完成 </el-tag>
+          <el-tag v-else-if="row.status === 'finished'" type="success">
+            已完成
+          </el-tag>
+        </template>
+
+        <template #createdAt="{ row }">
+          {{ formatTime(row?.createdAt) }}
         </template>
 
         <!-- 操作 -->
@@ -94,9 +100,9 @@
       <el-form-item label="任务名称" prop="title">
         <el-input v-model="formData.title" placeholder="请输入任务名称" />
       </el-form-item>
-      <el-form-item label="任务描述" prop="desc">
+      <el-form-item label="任务描述" prop="description">
         <el-input
-          v-model="formData.desc"
+          v-model="formData.description"
           type="textarea"
           placeholder="请输入任务描述"
         />
@@ -105,7 +111,7 @@
         <el-select v-model="formData.status" style="width: 100%">
           <el-option label="待处理" value="pending" />
           <el-option label="进行中" value="doing" />
-          <el-option label="已完成" value="finish" />
+          <el-option label="已完成" value="finished" />
         </el-select>
       </el-form-item>
     </el-form>
@@ -133,6 +139,9 @@ import {
 import { useCrud } from "@/composables/useCrud";
 import { useDialog } from "@/composables/useDialog";
 import { useRouter } from "vue-router";
+
+import { formatTime } from "@/utils/format";
+
 const router = useRouter();
 
 const handleView = (row) => {
@@ -170,7 +179,7 @@ const rules = {
     },
   ],
 
-  desc: [
+  description: [
     {
       required: true,
       message: "请输入任务描述",
@@ -193,9 +202,8 @@ const {
   handleSubmit,
 } = useDialog({
   defaultForm: {
-    _id: "",
     title: "",
-    desc: "",
+    description: "",
     status: "pending",
   },
 
@@ -220,7 +228,7 @@ const columns = [
   },
 
   {
-    prop: "desc",
+    prop: "description",
     label: "任务描述",
     minWidth: 220,
   },
@@ -236,9 +244,11 @@ const columns = [
     prop: "createdAt",
     label: "创建时间",
     width: 180,
+    slot: "createdAt",
   },
 ];
 onMounted(() => {
+  console.log("task页面 mounted");
   fetchList();
 });
 </script>

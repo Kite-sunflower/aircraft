@@ -5,7 +5,7 @@
       <div class="search-bar">
         <div class="left">
           <el-input
-            v-model="searchForm.keyword"
+            v-model="searchForm.username"
             placeholder="请输入用户名"
             clearable
             style="width: 220px"
@@ -19,8 +19,8 @@
           >
             <el-option label="管理员" value="admin" />
             <el-option label="员工" value="worker" />
-            <el-option label="工具管理员" value="toolDist" />
-            <el-option label="物料管理员" value="materialsDist" />
+            <el-option label="工具管理员" value="toolManager" />
+            <el-option label="物料管理员" value="materialManager" />
           </el-select>
 
           <el-button type="primary" @click="handleSearch"> 搜索 </el-button>
@@ -59,11 +59,17 @@
           <el-tag v-else-if="row.role === 'worker'" type="primary">
             员工
           </el-tag>
-          <el-tag v-else-if="row.role === 'toolDist'" type="primary">
+          <el-tag v-else-if="row.role === 'toolManager'" type="primary">
             工具管理员
           </el-tag>
 
-          <el-tag v-else type="success"> 物料管理员 </el-tag>
+          <el-tag v-else-if="row.role === 'materialManager'" type="success">
+            物料管理员
+          </el-tag>
+        </template>
+
+        <template #createdAt="{ row }">
+          {{ formatTime(row?.createdAt) }}
         </template>
 
         <!-- 操作 -->
@@ -71,8 +77,6 @@
           <el-button type="primary" link @click="handleEdit(row)">
             编辑
           </el-button>
-
-          <el-button type="success" link> 分配 </el-button>
 
           <el-button type="danger" link @click="handleDelete(row._id)">
             删除
@@ -89,8 +93,8 @@
     @close="handleCloseDialog"
   >
     <el-form ref="formRef" :model="formData" :rules="rules" label-width="80px">
-      <el-form-item label="用户名" prop="name">
-        <el-input v-model="formData.name" placeholder="请输入用户名" />
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="formData.username" placeholder="请输入用户名" />
       </el-form-item>
       <el-form-item v-if="!isEdit" label="密码" prop="password">
         <el-input
@@ -104,8 +108,8 @@
         <el-select v-model="formData.role" style="width: 100%">
           <el-option label="管理员" value="admin" />
           <el-option label="员工" value="worker" />
-          <el-option label="工具管理员" value="toolDist" />
-          <el-option label="物料管理员" value="materialsDist" />
+          <el-option label="工具管理员" value="toolManager" />
+          <el-option label="物料管理员" value="materialManager" />
         </el-select>
       </el-form-item>
     </el-form>
@@ -132,6 +136,9 @@ import {
 } from "@/api/user";
 import { useCrud } from "@/composables/useCrud";
 import { useDialog } from "@/composables/useDialog";
+
+import { formatTime } from "@/utils/format";
+
 const {
   loading,
   tableData,
@@ -150,10 +157,10 @@ const {
   getList: getUserList,
   deleteItem: deleteUser,
   batchDelete: batchDeleteUser,
-  searchConfig: ["name", "role"],
+  searchConfig: ["username", "role"],
 });
 const rules = {
-  name: [
+  username: [
     {
       required: true,
       message: "请输入用户名",
@@ -191,7 +198,7 @@ const {
 } = useDialog({
   defaultForm: {
     _id: "",
-    name: "",
+    username: "",
     password: "",
     role: "",
   },
@@ -211,7 +218,7 @@ const columns = [
     width: 120,
   },
   {
-    prop: "name",
+    prop: "username",
     label: "用户名",
     minWidth: 180,
   },
@@ -227,6 +234,7 @@ const columns = [
     prop: "createdAt",
     label: "创建时间",
     width: 180,
+    slot: "createdAt",
   },
 ];
 onMounted(() => {

@@ -2,8 +2,8 @@ const User = require('../models/user');
 
 const pagination = require('../utils/pagination');
 
-exports.getAll = async (page) => {
-  return await pagination(User, page);
+exports.getAll = async (page, limit) => {
+  return await pagination(User, page, limit);
 };
 exports.getOne = async (id) => {
   const user = await User.findById(id);

@@ -47,35 +47,14 @@ export function useCrud(options) {
     loading.value = true;
 
     try {
-      let list = await getList();
-
-      /**
-       * search filter
-       */
-      searchConfig.forEach((key) => {
-        if (!searchForm[key]) return;
-
-        list = list.filter((item) => {
-          const value = item[key];
-
-          if (typeof value === "string") {
-            return value.includes(searchForm[key]);
-          }
-
-          return value === searchForm[key];
-        });
+      const res = await getList({
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        ...searchForm,
       });
 
-      /**
-       * pagination
-       */
-      const start = (pagination.page - 1) * pagination.pageSize;
-
-      const end = start + pagination.pageSize;
-
-      tableData.value = list.slice(start, end);
-
-      pagination.total = list.length;
+      tableData.value = res.list;
+      pagination.total = res.total;
     } finally {
       loading.value = false;
     }

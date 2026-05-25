@@ -1,34 +1,32 @@
-import { taskList } from "@/mock/task";
-
-/**
- * 模拟延迟
- */
-const delay = (time = 300) =>
-  new Promise((resolve) => setTimeout(resolve, time));
+import request from "@/utils/request";
 
 /**
  * 获取列表
  */
-export const getTaskList = async () => {
-  await delay();
-  return taskList;
+export const getTaskList = async (params) => {
+  return request({
+    url: "/task",
+    method: "get",
+    params,
+  });
+
+  return res.list;
 };
 // 获取任务详情
 export const getTaskDetail = async (id) => {
-  await delay();
-
-  return taskList.find((item) => item._id === id);
+  return request({
+    url: `/task/${id}`,
+    method: "get",
+  });
 };
 /**
  * 新增
  */
 export const createTask = async (data) => {
-  await delay();
-
-  taskList.unshift({
-    _id: Date.now().toString(),
-    ...data,
-    createdAt: new Date().toISOString().split("T")[0],
+  return request({
+    url: "/task/create",
+    method: "post",
+    data,
   });
 };
 
@@ -36,42 +34,37 @@ export const createTask = async (data) => {
  * 更新
  */
 export const updateTask = async (id, data) => {
-  await delay();
-
-  const index = taskList.findIndex((item) => item._id === id);
-
-  if (index !== -1) {
-    taskList[index] = {
-      ...taskList[index],
-      ...data,
-    };
-  }
+  return request({
+    url: `/task/${id}/update`,
+    method: "put",
+    data,
+  });
 };
 
 /**
  * 删除
  */
 export const deleteTask = async (id) => {
-  await delay();
-
-  const index = taskList.findIndex((item) => item._id === id);
-
-  if (index !== -1) {
-    taskList.splice(index, 1);
-  }
+  return request({
+    url: `/task/${id}/delete`,
+    method: "delete",
+  });
 };
-
 /**
  * 批量删除
  */
 export const batchDeleteTask = async (ids) => {
-  await delay();
-
-  ids.forEach((id) => {
-    const index = taskList.findIndex((item) => item._id === id);
-
-    if (index !== -1) {
-      taskList.splice(index, 1);
-    }
+  return request({
+    url: "/task/batch/delete",
+    method: "post",
+    data: { ids },
+  });
+};
+//分配任务
+export const assignTask = async (id, data) => {
+  return request({
+    url: `/task/${id}/distribute`,
+    method: "put",
+    data,
   });
 };

@@ -5,7 +5,7 @@
       <div class="search-bar">
         <div class="left">
           <el-input
-            v-model="searchForm.keyword"
+            v-model="searchForm.name"
             placeholder="请输入工具名称"
             clearable
             style="width: 220px"
@@ -17,7 +17,6 @@
             clearable
             style="width: 160px"
           >
-            <el-option label="出借" value="borrowed" />
             <el-option label="可用" value="available" />
             <el-option label="维修" value="repair" />
           </el-select>
@@ -53,15 +52,15 @@
       >
         <!-- 状态 -->
         <template #status="{ row }">
-          <el-tag v-if="row.status === 'borrowed'" type="warning">
-            出借
-          </el-tag>
+          <el-tag v-if="row.status === 'repair'" type="warning"> 维修 </el-tag>
 
           <el-tag v-else-if="row.status === 'available'" type="primary">
             可用
           </el-tag>
+        </template>
 
-          <el-tag v-else type="warning"> 维修 </el-tag>
+        <template #createdAt="{ row }">
+          {{ formatTime(row?.createdAt) }}
         </template>
 
         <!-- 操作 -->
@@ -114,7 +113,6 @@
         <el-select v-model="formData.status" style="width: 100%">
           <el-option label="可用" value="available" />
           <el-option label="维修" value="repair" />
-          <el-option label="出借" value="borrowed" />
         </el-select>
       </el-form-item>
     </el-form>
@@ -142,6 +140,9 @@ import {
 import { useCrud } from "@/composables/useCrud";
 import { useDialog } from "@/composables/useDialog";
 import { useRouter } from "vue-router";
+
+import { formatTime } from "@/utils/format";
+
 const router = useRouter();
 
 const handleView = (row) => {
@@ -242,6 +243,11 @@ const columns = [
     label: "库存",
     minWidth: 180,
   },
+  {
+    prop: "availableStock",
+    label: "可用库存",
+    minWidth: 180,
+  },
 
   {
     prop: "status",
@@ -254,6 +260,7 @@ const columns = [
     prop: "createdAt",
     label: "创建时间",
     width: 180,
+    slot: "createdAt",
   },
 ];
 onMounted(() => {

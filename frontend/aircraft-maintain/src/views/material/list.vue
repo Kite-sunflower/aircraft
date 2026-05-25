@@ -5,7 +5,7 @@
       <div class="search-bar">
         <div class="left">
           <el-input
-            v-model="searchForm.keyword"
+            v-model="searchForm.name"
             placeholder="请输入物料名称"
             clearable
             style="width: 220px"
@@ -40,6 +40,10 @@
         @page-change="handlePageChange"
         @selection-change="handleSelectionChange"
       >
+        <template #createdAt="{ row }">
+          {{ formatTime(row?.createdAt) }}
+        </template>
+
         <!-- 操作 -->
         <template #action="{ row }">
           <el-button type="primary" link @click="handleEdit(row)">
@@ -101,6 +105,9 @@ import {
 import { useCrud } from "@/composables/useCrud";
 import { useDialog } from "@/composables/useDialog";
 import { useRouter } from "vue-router";
+
+import { formatTime } from "@/utils/format";
+
 const router = useRouter();
 
 const handleView = (row) => {
@@ -191,11 +198,17 @@ const columns = [
     label: "库存",
     minWidth: 180,
   },
+  {
+    prop: "availableStock",
+    label: "可用库存",
+    minWidth: 180,
+  },
 
   {
     prop: "createdAt",
     label: "创建时间",
     width: 180,
+    slot: "createdAt",
   },
 ];
 onMounted(() => {

@@ -10,9 +10,9 @@ const {
 
 exports.getAllUser = async (req, res) => {
   try {
-    const { page } = req.query;
-    const items = await getAll(page);
-    res.sendSuccess(200, items, '获取用户列表');
+    const { page = 1, limit = 10 } = req.query;
+    const userData = await getAll(page, limit);
+    res.sendSuccess(200, userData, '获取用户列表');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

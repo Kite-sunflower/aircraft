@@ -11,9 +11,11 @@ const {
 
 exports.getAllTask = async (req, res) => {
   try {
-    const taskData = await getAll(req.query.page);
+    const { page = 1, limit = 10 } = req.query;
+    const taskData = await getAll(page, limit);
     res.sendSuccess(200, taskData, '获取任务列表成功');
   } catch (error) {
+    console.log(error);
     res.sendFail(400, null, error.message);
   }
 };

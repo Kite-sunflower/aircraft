@@ -16,10 +16,6 @@ const toolRouter = require('./src/routes/toolRoute');
 const taskRouter = require('./src/routes/taskRoute');
 const materialRouter = require('./src/routes/materialRoute');
 
-//接口文档
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./swagger');
-
 const app = express();
 
 app.use(cors());
@@ -35,8 +31,6 @@ app.use('/api/user', userRoute);
 app.use('/api/tool', toolRouter);
 app.use('/api/task', taskRouter);
 app.use('/api/material', materialRouter);
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/test', (req, res) => {
   res.send('后端接口成功');

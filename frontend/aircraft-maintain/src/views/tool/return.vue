@@ -2,32 +2,27 @@
   <el-card>
     <el-form :model="formData" label-width="100px">
       <el-form-item label="工具ID">
-        <el-input v-model="formData.toolId" disabled />
+        <el-input v-model="formData._id" disabled />
       </el-form-item>
 
       <el-form-item label="工具名称">
         <el-input v-model="formData.name" disabled />
       </el-form-item>
       <el-form-item label="出借数量">
-        <el-input v-model="formData.usedQuantity" disabled />
+        <el-input v-model="formData.quantity" disabled />
       </el-form-item>
       <el-form-item label="归还数量">
-        <el-input-number
-          v-model="formData.returnQuantity"
-          :min="1"
-          :max="formData.usedQuantity"
-          style="width: 100%"
-        />
+        <el-input v-model="formData.quantity" disabled />
       </el-form-item>
-      <el-form-item label="回收者">
+      <el-form-item label="工具管理员">
         <el-select
-          v-model="formData.collector"
-          placeholder="请选择回收者"
+          v-model="formData.lender"
+          placeholder="请选择工具管理员"
           style="width: 100%"
         >
-          <el-option label="张三" value="张三" />
+          <el-option label="张三" value="1" />
 
-          <el-option label="李四" value="李四" />
+          <el-option label="李四" value="2" />
         </el-select>
       </el-form-item>
       <el-form-item label="归还者">
@@ -36,9 +31,9 @@
           placeholder="请选择归还者"
           style="width: 100%"
         >
-          <el-option label="张三" value="张三" />
+          <el-option label="张三" value="1" />
 
-          <el-option label="李四" value="李四" />
+          <el-option label="李四" value="2" />
         </el-select>
       </el-form-item>
       <el-form-item label="借用者">
@@ -60,11 +55,11 @@ const route = useRoute();
 const router = useRouter();
 
 const formData = ref({
-  toolId: "",
+  _id: "",
   name: "",
-  usedQuantity: 1,
+  quantity: 1,
   returnQuantity: 1,
-  collector: "",
+  lender: "",
   returner: "",
 });
 const handleSubmit = () => {
@@ -75,13 +70,13 @@ const handleSubmit = () => {
 onMounted(() => {
   // mock 数据
   formData.value = {
-    toolId: route.params.id,
+    _id: route.params.id,
     name: "螺丝刀",
-    usedQuantity: 1,
+    quantity: 10,
     returnQuantity: 1,
-    collector: "材料管理员",
-    returner: "张三",
-    borrower: "张三",
+    lender: "1",
+    returner: "2",
+    borrower: "3",
   };
 });
 </script>

@@ -1,8 +1,8 @@
 const Material = require('../models/material');
 const pagination = require('../utils/pagination');
 
-exports.getAll = async (page) => {
-  return await pagination(Material, page);
+exports.getAll = async (page, limit) => {
+  return await pagination(Material, page, limit);
 };
 
 exports.getOne = async (id) => {

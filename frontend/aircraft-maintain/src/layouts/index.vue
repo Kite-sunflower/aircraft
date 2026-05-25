@@ -85,21 +85,17 @@ const menus = [
 ];
 const handleLogout = async () => {
   try {
-    // 二次确认
-    await ElMessageBox.confirm("确认退出当前账号吗？", "退出登录", {
-      confirmButtonText: "确认",
-      cancelButtonText: "取消",
-      type: "warning",
-    });
+    await ElMessageBox.confirm("确认退出当前账号吗？");
 
-    // 清空本地数据
+    const userStore = useUserStore();
+
+    userStore.token = "";
+    userStore.userInfo = null;
+
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
 
-    ElMessage.success("退出成功");
-
-    // 跳转登录页
-    router.push("/login");
+    router.replace("/login");
   } catch (error) {
     console.log(error);
   }

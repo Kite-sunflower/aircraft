@@ -1,7 +1,7 @@
 module.exports = (req, res, next) => {
   res.sendFail = (statusCode, data, message) => {
     return res.status(statusCode).json({
-      status: 'fail',
+      success: false,
       data,
       message,
       requestTime: req.requestTime,
@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
   };
   res.sendSuccess = (statusCode, data, message) => {
     return res.status(statusCode).json({
-      status: 'success',
+      success: true,
       data,
       message,
       requestTime: req.requestTime,

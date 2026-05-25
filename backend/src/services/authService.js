@@ -30,7 +30,7 @@ exports.loginUser = async (username, password) => {
   delete userInfo.password;
 
   return {
-    user: userInfo,
+    userInfo,
     token,
   };
 };

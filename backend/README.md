@@ -32,7 +32,7 @@ POST /api/auth/register
 "code": 200,
 "message": "注册成功",
 "data": {
-"\_id": "userId",
+"_id": "userId",
 "username": "test",
 "role": "worker",
 "status": "active"

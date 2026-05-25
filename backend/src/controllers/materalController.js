@@ -9,8 +9,8 @@ const {
 
 exports.getAllMaterial = async (req, res) => {
   try {
-    const { page } = req.query;
-    const materialData = await getAll(page);
+    const { page = 1, limit = 10 } = req.query;
+    const materialData = await getAll(page, limit);
     res.sendSuccess(200, materialData, '获取材料列表成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
@@ -27,7 +27,7 @@ exports.getOneMaterial = async (req, res) => {
 exports.createMaterial = async (req, res) => {
   try {
     const newMaterial = await create(req.body);
-    res.sendSuccess(200, newMaterial, '创建材料成功');
+    res.sendSuccess(201, newMaterial, '创建材料成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

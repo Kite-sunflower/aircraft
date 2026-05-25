@@ -81,12 +81,16 @@ export function useDialog(options) {
       if (isEdit.value) {
         await updateApi(formData.value._id, formData.value);
       } else {
-        await createApi(formData.value);
+        const { _id, ...payload } = formData.value;
+        await createApi(payload);
       }
 
       await fetchList();
-
       handleCloseDialog();
+    } catch (err) {
+      console.log(" 后端错误:", err.response?.data || err);
+
+      ElMessage.error(err.response?.data?.message || "提交失败");
     } finally {
       submitLoading.value = false;
     }

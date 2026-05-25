@@ -1,20 +1,18 @@
-async function pagination(Model, page = 1, limit = 10, sortObj = { createdAt: -1 }) {
+async function pagination(Model, page, pageSize, sortObj = { createdAt: -1 }) {
   page = parseInt(page);
-  limit = parseInt(limit);
+  pageSize = parseInt(pageSize);
 
-  const skip = (page - 1) * limit;
+  const skip = (page - 1) * pageSize;
 
-  const data = await Model.find().sort(sortObj).skip(skip).limit(limit);
+  const list = await Model.find().sort(sortObj).skip(skip).limit(pageSize);
 
   const total = await Model.countDocuments();
 
-  const pages = Math.ceil(total / limit);
   return {
+    list,
     total,
     page,
-    pages,
-    limit,
-    data,
+    pageSize,
   };
 }
 module.exports = pagination;
