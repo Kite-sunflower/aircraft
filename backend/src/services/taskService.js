@@ -60,7 +60,9 @@ exports.deleteOne = async (id) => {
     throw new Error('任务不存在');
   }
   await Task.findByIdAndDelete(id);
-  return true;
+  return {
+    deletedCount: 1,
+  };
 };
 
 exports.deleteBatch = async (ids) => {
@@ -73,8 +75,10 @@ exports.deleteBatch = async (ids) => {
     throw new Error('部分数据不存在');
   }
 
-  await Task.deleteMany({ _id: { $in: ids } });
-  return true;
+  const result = await Task.deleteMany({ _id: { $in: ids } });
+  return {
+    deletdCount: result.deletedCount,
+  };
 };
 
 //核心逻辑

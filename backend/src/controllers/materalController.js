@@ -42,8 +42,8 @@ exports.updateMaterial = async (req, res) => {
 };
 exports.deleteMaterial = async (req, res) => {
   try {
-    await deleteId(req.params.id);
-    res.sendSuccess(200, null, '删除材料成功');
+    const result = await deleteId(req.params.id);
+    res.sendSuccess(200, result, '删除材料成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
@@ -51,8 +51,8 @@ exports.deleteMaterial = async (req, res) => {
 exports.deleteBatchMaterial = async (req, res) => {
   try {
     const { ids } = req.body;
-    await deleteBatch(ids);
-    res.sendSuccess(200, null, '删除材料成功');
+    const result = await deleteBatch(ids);
+    res.sendSuccess(200, result, '删除材料成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

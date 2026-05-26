@@ -15,6 +15,8 @@ const userRoute = require('./src/routes/userRoute');
 const toolRouter = require('./src/routes/toolRoute');
 const taskRouter = require('./src/routes/taskRoute');
 const materialRouter = require('./src/routes/materialRoute');
+const toolRecordsRouter = require('./src/routes/toolRecordsRoute');
+const materialRecordsRouter = require('./src/routes/materialRecordsRoute');
 
 const app = express();
 
@@ -31,6 +33,8 @@ app.use('/api/user', userRoute);
 app.use('/api/tool', toolRouter);
 app.use('/api/task', taskRouter);
 app.use('/api/material', materialRouter);
+app.use('/api/toolRecords', toolRecordsRouter);
+app.use('/api/materialRecords', materialRecordsRouter);
 
 app.get('/test', (req, res) => {
   res.send('后端接口成功');

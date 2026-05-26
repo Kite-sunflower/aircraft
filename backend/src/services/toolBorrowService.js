@@ -60,34 +60,28 @@ exports.borrowTool = async ({ toolId, borrower, lender, quantity }) => {
 };
 
 // 归还工具
-exports.returnTool = async (recordId, returnerId) => {
+exports.returnTool = async ({ toolId, returner }) => {
   // 参数校验
-  if (!recordId) {
-    throw new Error('记录ID不能为空');
+  if (!toolId) {
+    throw new Error('工具ID不能为空');
   }
 
-  if (!returnerId) {
+  if (!returner) {
     throw new Error('归还人不能为空');
   }
-
-  // 查找记录
-  const record = await ToolBorrowRecord.findById(recordId);
+  //根据toolId来查找到借这个工具的记录
+  const record = await ToolBorrowRecord.findOne({
+    tool: toolId,
+    borrower: returner, // 谁借的谁还
+    status: 'borrowing', // 只找未归还的
+  });
 
   if (!record) {
-    throw new Error('记录不存在');
-  }
-
-  // 已归还校验
-  if (record.status === 'returned') {
-    throw new Error('工具已归还');
+    throw new Error('工具借用记录不存在');
   }
 
   // 查找工具
   const tool = await Tool.findById(record.tool);
-
-  if (!tool) {
-    throw new Error('工具不存在');
-  }
 
   // 防止库存异常
   if (tool.availableStock + record.quantity > tool.stock) {
@@ -102,7 +96,7 @@ exports.returnTool = async (recordId, returnerId) => {
   // 更新记录
   record.status = 'returned';
   record.returnAt = new Date();
-  record.returner = returnerId;
+  record.returner = returner;
 
   await record.save();
 
@@ -162,38 +156,34 @@ exports.getOneToolId = async (toolId) => {
     .sort({ createdAt: -1 });
 };
 
-// 创建借用记录
-exports.create = async (data) => {
-  return await ToolBorrowRecord.create(data);
-};
-
-// 更新记录
-exports.update = async (id, data) => {
-  if (!id) {
-    throw new Error('记录ID不能为空');
-  }
-
-  return await ToolBorrowRecord.findByIdAndUpdate(id, data, {
-    new: true,
-  });
-};
-
 // 删除记录
 exports.deleteOne = async (id) => {
-  if (!id) {
-    throw new Error('记录ID不能为空');
+  const record = await ToolBorrowRecord.findByIdAndDelete(id);
+  if (!record) {
+    throw new Error('记录不存在');
   }
-
-  return await ToolBorrowRecord.findByIdAndDelete(id);
+  return {
+    deletedCount: 1,
+  };
 };
 
 // 批量删除
-exports.batchDelete = async (ids) => {
+exports.deleteBatch = async (ids) => {
   if (!ids || !Array.isArray(ids) || ids.length === 0) {
     throw new Error('ids不能为空');
   }
 
-  return await ToolBorrowRecord.deleteMany({
+  const list = await ToolBorrowRecord.find({ _id: { $in: ids } });
+
+  if (list.length !== ids.length) {
+    throw new Error('部分数据不存在');
+  }
+
+  const result = await ToolBorrowRecord.deleteMany({
     _id: { $in: ids },
   });
+
+  return {
+    deletedCount: result.deletedCount,
+  };
 };

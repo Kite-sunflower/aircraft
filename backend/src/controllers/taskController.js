@@ -45,8 +45,8 @@ exports.updateTask = async (req, res) => {
 };
 exports.deleteTask = async (req, res) => {
   try {
-    await deleteOne(req.params.id);
-    res.sendSuccess(200, null, '删除任务成功');
+    const result = await deleteOne(req.params.id);
+    res.sendSuccess(200, result, '删除任务成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
@@ -54,8 +54,8 @@ exports.deleteTask = async (req, res) => {
 exports.deleteBatchTask = async (req, res) => {
   try {
     const { ids } = req.body;
-    await deleteBatch(ids);
-    res.sendSuccess(200, null, '批量删除任务成功');
+    const result = await deleteBatch(ids);
+    res.sendSuccess(200, result, '批量删除任务成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

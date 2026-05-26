@@ -2,7 +2,7 @@ const Material = require('../models/material');
 const MaterialReceiveRecord = require('../models/materialReceiveRecord');
 
 // 发放物料
-exports.distribute = async (materialId, receiverId, quantity, distributorId) => {
+exports.distribute = async (materialId, receiver, quantity, distributor) => {
   const material = await Material.findById(materialId);
 
   if (!material) {
@@ -22,8 +22,8 @@ exports.distribute = async (materialId, receiverId, quantity, distributorId) => 
 
   const record = await MaterialReceiveRecord.create({
     material: materialId,
-    distributor: distributorId,
-    receiver: receiverId,
+    distributor: distributor,
+    receiver: receiver,
     quantity,
   });
 
@@ -82,24 +82,6 @@ exports.getOneMaterialId = async (materialId) => {
   return list;
 };
 
-// 创建记录
-exports.create = async (data) => {
-  return await MaterialReceiveRecord.create(data);
-};
-
-// 更新记录
-exports.update = async (id, data) => {
-  const record = await MaterialReceiveRecord.findByIdAndUpdate(id, data, {
-    new: true,
-  });
-
-  if (!record) {
-    throw new Error('记录不存在');
-  }
-
-  return record;
-};
-
 // 删除记录
 exports.deleteOne = async (id) => {
   const record = await MaterialReceiveRecord.findByIdAndDelete(id);
@@ -107,17 +89,25 @@ exports.deleteOne = async (id) => {
   if (!record) {
     throw new Error('记录不存在');
   }
-
-  return record;
+  return {
+    deletedCount: 1,
+  };
 };
 
 // 批量删除
-exports.batchDelete = async (ids) => {
+exports.deleteBatch = async (ids) => {
   if (!Array.isArray(ids) || ids.length === 0) {
     throw new Error('ids不能为空');
   }
+  const list = await MaterialReceiveRecord.find({ _id: { $in: ids } });
 
-  return await MaterialReceiveRecord.deleteMany({
+  if (list.length !== ids.length) {
+    throw new Error('部分数据不存在');
+  }
+  const result = await MaterialReceiveRecord.deleteMany({
     _id: { $in: ids },
   });
+  return {
+    deletedCount: result.deletedCount,
+  };
 };

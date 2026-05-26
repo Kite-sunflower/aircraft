@@ -42,7 +42,9 @@ exports.deleteOne = async (id) => {
 
   if (!tool) throw new Error('工具不存在');
 
-  return true;
+  return {
+    deletedCount: 1,
+  };
 };
 exports.deleteBatch = async (ids) => {
   if (!Array.isArray(ids) || ids.length === 0) {
@@ -55,8 +57,10 @@ exports.deleteBatch = async (ids) => {
     throw new Error('部分数据不存在');
   }
 
-  await Tool.deleteMany({ _id: { $in: ids } });
-  return true;
+  const result = await Tool.deleteMany({ _id: { $in: ids } });
+  return {
+    deletedCount: result.deletedCount,
+  };
 };
 exports.statusSetup = async (id, status) => {
   const tool = await Tool.findById(id);

@@ -45,7 +45,9 @@ exports.deleteId = async (id) => {
     throw new Error('材料不存在');
   }
 
-  return true;
+  return {
+    deletedCount: 1,
+  };
 };
 exports.deleteBatch = async (ids) => {
   if (!Array.isArray(ids) || ids.length === 0) {
@@ -55,6 +57,8 @@ exports.deleteBatch = async (ids) => {
   if (list.length !== ids.length) {
     throw new Error('部分数据不存在');
   }
-  await Material.deleteMany({ _id: { $in: ids } });
-  return true;
+  const result = await Material.deleteMany({ _id: { $in: ids } });
+  return {
+    deletedCount: result.deletedCount,
+  };
 };

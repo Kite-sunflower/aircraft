@@ -3,18 +3,16 @@ const {
   getAll,
   getOne,
   getOneMaterial,
-  create,
-  update,
   deleteOne,
-  batchDelete,
+  deleteBatch,
 } = require('../services/materialReceiveService');
 
 // 发放物料
 exports.distributeMaterial = async (req, res) => {
   try {
     const result = await distribute(
-      req.params.id,
-      req.body.receiverId,
+      req.params.materialId,
+      req.body.receiver,
       req.body.quantity,
       req.user._id
     );
@@ -57,25 +55,6 @@ exports.getOneMaterialIdRecords = async (req, res) => {
     res.sendFail(400, null, err.message);
   }
 };
-// 创建
-exports.createRecords = async (req, res) => {
-  try {
-    const result = await create(req.body);
-    res.sendSuccess(200, result, '创建成功');
-  } catch (err) {
-    res.sendFail(400, null, err.message);
-  }
-};
-
-// 更新
-exports.updateRecords = async (req, res) => {
-  try {
-    const result = await update(req.params.id, req.body);
-    res.sendSuccess(200, result, '更新成功');
-  } catch (err) {
-    res.sendFail(400, null, err.message);
-  }
-};
 
 // 删除
 exports.deleteOneRecords = async (req, res) => {
@@ -88,13 +67,13 @@ exports.deleteOneRecords = async (req, res) => {
 };
 
 // 批量删除
-exports.batchDeleteRecords = async (req, res) => {
+exports.deleteBatchRecords = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    const result = await batchDelete(ids);
+    const result = await deleteBatch(ids);
 
-    res.sendSuccess(200, result, '批量删除成功');
+    res.sendSuccess(200, result, `批量删除材料记录成功,共删除 ${result.deletedCount} 条`);
   } catch (err) {
     res.sendFail(400, null, err.message);
   }

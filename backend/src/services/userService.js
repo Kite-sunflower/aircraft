@@ -66,7 +66,9 @@ exports.deleteId = async (id) => {
   }
 
   await User.findByIdAndDelete(id);
-  return true;
+  return {
+    deletedCount: 1,
+  };
 };
 exports.deleteBatch = async (ids) => {
   if (!Array.isArray(ids) || ids.length === 0) {
@@ -81,8 +83,10 @@ exports.deleteBatch = async (ids) => {
     throw new Error('禁止删除管理员');
   }
 
-  await User.deleteMany({ _id: { $in: ids } });
-  return true;
+  const result = await User.deleteMany({ _id: { $in: ids } });
+  return {
+    deletedCount: result.deletedCount,
+  };
 };
 
 exports.roleSetup = async (id, role) => {

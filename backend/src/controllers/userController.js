@@ -45,8 +45,8 @@ exports.updateUser = async (req, res) => {
 };
 exports.deleteUser = async (req, res) => {
   try {
-    await deleteId(req.params.id);
-    res.sendSuccess(200, null, '删除用户成功');
+    const result = await deleteId(req.params.id);
+    res.sendSuccess(200, result, '删除用户成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
@@ -54,8 +54,8 @@ exports.deleteUser = async (req, res) => {
 exports.deleteBatchUser = async (req, res) => {
   try {
     const { ids } = req.body;
-    await deleteBatch(ids);
-    res.sendSuccess(200, null, '批量删除用户成功');
+    const result = await deleteBatch(ids);
+    res.sendSuccess(200, result, '批量删除用户成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

@@ -43,8 +43,8 @@ exports.updateTool = async (req, res) => {
 };
 exports.deleteTool = async (req, res) => {
   try {
-    await deleteOne(req.params.id);
-    res.sendSuccess(200, null, '删除工具成功');
+    const result = await deleteOne(req.params.id);
+    res.sendSuccess(200, result, '删除工具成功');
   } catch (error) {
     res.sendFail(404, null, error.message);
   }
@@ -52,8 +52,8 @@ exports.deleteTool = async (req, res) => {
 exports.deleteBatchTool = async (req, res) => {
   try {
     const { ids } = req.body;
-    await deleteBatch(ids);
-    res.sendSuccess(200, null, '批量删除工具成功');
+    const result = await deleteBatch(ids);
+    res.sendSuccess(200, result, '批量删除工具成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
