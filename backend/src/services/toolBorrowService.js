@@ -20,33 +20,24 @@ exports.borrowTool = async ({ toolId, borrower, lender, quantity }) => {
     throw new Error('借用数量非法');
   }
 
-  // 查找工具
-  const tool = await Tool.findById(toolId);
+  //并发安全锁
+  const tool = await Tool.findOneAndUpdate(
+    {
+      _id: toolId,
+      status: 'available',
+      availableStock: { $gte: quantity }, // 库存必须 >= 借用数量
+      stock: { $gte: quantity }, // 借用数量不能 > 总库存
+    },
+    {
+      $inc: { availableStock: -quantity }, // 原子扣减（并发安全）
+    },
+    { new: true } // 返回更新后的数据
+  );
 
+  // 如果 tool 为 null，说明条件不满足（库存不足/工具不存在）
   if (!tool) {
-    throw new Error('工具不存在');
+    throw new Error('库存不足或工具不可用');
   }
-
-  // 工具状态校验
-  if (tool.status !== 'available') {
-    throw new Error('工具不可用');
-  }
-
-  // 库存校验
-  if (tool.availableStock < quantity) {
-    throw new Error('库存不足');
-  }
-
-  // 防止超过总库存
-  if (quantity > tool.stock) {
-    throw new Error('借用数量超过总库存');
-  }
-
-  // 扣减库存
-  tool.availableStock -= quantity;
-
-  await tool.save();
-
   // 创建借用记录
   const record = await ToolBorrowRecord.create({
     tool: toolId,
@@ -80,18 +71,24 @@ exports.returnTool = async ({ toolId, returner }) => {
     throw new Error('工具借用记录不存在');
   }
 
-  // 查找工具
-  const tool = await Tool.findById(record.tool);
+  //并发安全锁
+  const tool = await Tool.findOneAndUpdate(
+    {
+      _id: record.tool,
+      // 安全判断：归还后不能超过总库存
+      $expr: { $lte: [{ $add: ['$availableStock', record.quantity] }, '$stock'] },
+    },
+    {
+      // 原子增加库存（并发安全）
+      $inc: { availableStock: record.quantity },
+    },
+    { new: true }
+  );
 
-  // 防止库存异常
-  if (tool.availableStock + record.quantity > tool.stock) {
-    throw new Error('归还数量异常');
+  // 如果 tool = null，说明归还后会超库存 → 异常
+  if (!tool) {
+    throw new Error('归还失败：库存异常，可能是重复归还');
   }
-
-  // 增加库存
-  tool.availableStock += record.quantity;
-
-  await tool.save();
 
   // 更新记录
   record.status = 'returned';
@@ -104,10 +101,9 @@ exports.returnTool = async ({ toolId, returner }) => {
 };
 
 // 获取全部记录（分页）
-exports.getAll = async (page, pageSize) => {
+exports.getAll = async (page = 1, pageSize = 10) => {
   page = parseInt(page);
   pageSize = parseInt(pageSize);
-
   const skip = (page - 1) * pageSize;
 
   const list = await ToolBorrowRecord.find()
@@ -143,17 +139,31 @@ exports.getOne = async (id) => {
 };
 
 // 按工具查询记录
-exports.getOneToolId = async (toolId) => {
+exports.getOneToolId = async (toolId, page = 1, pageSize = 10) => {
   if (!toolId) {
     throw new Error('工具ID不能为空');
   }
+  page = parseInt(page);
+  pageSize = parseInt(pageSize);
+  const skip = (page - 1) * pageSize;
 
-  return await ToolBorrowRecord.find({ tool: toolId })
+  const list = await ToolBorrowRecord.find({ tool: toolId })
     .populate('tool')
     .populate('lender')
     .populate('borrower')
     .populate('returner')
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(pageSize);
+  const total = await ToolBorrowRecord.countDocuments({ tool: toolId });
+
+  // 返回统一分页格式
+  return {
+    list,
+    total,
+    page,
+    pageSize,
+  };
 };
 
 // 删除记录

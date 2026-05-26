@@ -26,7 +26,9 @@ exports.distributeMaterial = async (req, res) => {
 // 获取全部记录
 exports.getAllRecords = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10 } = req.query;
+    // 最安全的分页写法（解析数字 + 兜底默认值）
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
 
     const result = await getAll(page, pageSize);
 
@@ -47,9 +49,17 @@ exports.getOneRecords = async (req, res) => {
 };
 //
 // 根据材料id获取单条
+// 根据材料id获取记录（分页版）
 exports.getOneMaterialIdRecords = async (req, res) => {
   try {
-    const result = await getOneMaterial(req.params.id);
+    const materialId = req.params.id;
+    // 从前端接收分页参数，给默认值（最规范）
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    // 把分页参数传给 service
+    const result = await getOneMaterialId(materialId, page, pageSize);
+
     res.sendSuccess(200, result, '获取成功');
   } catch (err) {
     res.sendFail(400, null, err.message);

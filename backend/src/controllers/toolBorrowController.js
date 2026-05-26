@@ -43,7 +43,9 @@ exports.returnToolRecord = async (req, res) => {
 // 获取全部记录（分页）
 exports.getAllRecord = async (req, res) => {
   try {
-    const { page = 1, pageSize = 10 } = req.query;
+    // 最稳健写法：转数字 + 默认值，防止前端传奇怪参数
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
 
     const result = await getAll(page, pageSize);
 
@@ -64,10 +66,17 @@ exports.getOneRecord = async (req, res) => {
   }
 };
 
-// 根据工具ID获取记录
+// 根据工具ID获取记录（分页版）
 exports.getOneToolIdRecord = async (req, res) => {
   try {
-    const result = await getOneToolId(req.params.toolId);
+    const { toolId } = req.params;
+
+    // 分页参数：解析数字 + 默认值（最稳写法）
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    // 把 3 个参数全部传给 service
+    const result = await getOneToolId(toolId, page, pageSize);
 
     res.sendSuccess(200, result, '获取工具借用记录成功');
   } catch (err) {

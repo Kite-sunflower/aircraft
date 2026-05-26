@@ -3,23 +3,34 @@ const MaterialReceiveRecord = require('../models/materialReceiveRecord');
 
 // 发放物料
 exports.distribute = async (materialId, receiver, quantity, distributor) => {
-  const material = await Material.findById(materialId);
-
-  if (!material) {
-    throw new Error('材料不存在');
+  if (!materialId) {
+    throw new Error('材料ID不能为空');
   }
-
+  if (!receiver) {
+    throw new Error('领取人不能为空');
+  }
+  if (!distributor) {
+    throw new Error('发放人不能为空');
+  }
   if (!quantity || quantity <= 0) {
     throw new Error('领取数量非法');
   }
 
-  if (material.availableStock < quantity) {
-    throw new Error('材料库存不足');
+  const material = await Material.findOneAndUpdate(
+    {
+      _id: materialId,
+      availableStock: { $gte: quantity }, // 库存必须足够才允许发放
+    },
+    {
+      $inc: { availableStock: -quantity }, // 原子扣减（并发安全）
+    },
+    { new: true } // 返回更新后的物料数据
+  );
+
+  // 如果 material = null → 材料不存在 或 库存不足
+  if (!material) {
+    throw new Error('材料库存不足或不存在');
   }
-
-  material.availableStock -= quantity;
-  await material.save();
-
   const record = await MaterialReceiveRecord.create({
     material: materialId,
     distributor: distributor,
@@ -31,10 +42,9 @@ exports.distribute = async (materialId, receiver, quantity, distributor) => {
 };
 
 // 获取全部记录（分页）
-exports.getAll = async (page, pageSize) => {
+exports.getAll = async (page = 1, pageSize = 10) => {
   page = parseInt(page);
   pageSize = parseInt(pageSize);
-
   const skip = (page - 1) * pageSize;
 
   const list = await MaterialReceiveRecord.find()
@@ -70,15 +80,35 @@ exports.getOne = async (id) => {
 };
 
 // 根据材料ID查询记录
-exports.getOneMaterialId = async (materialId) => {
+exports.getOneMaterialId = async (materialId, page = 1, pageSize = 10) => {
+  if (!materialId) {
+    throw new Error('材料ID不能为空');
+  }
+
+  page = parseInt(page);
+  pageSize = parseInt(pageSize);
+  const skip = (page - 1) * pageSize;
+
   const list = await MaterialReceiveRecord.find({
     material: materialId,
   })
     .populate('material')
     .populate('distributor')
     .populate('receiver')
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(pageSize);
 
+  // 查询总条数
+  const total = await MaterialReceiveRecord.countDocuments({ material: materialId });
+
+  // 返回统一分页结构
+  return {
+    list,
+    total,
+    page,
+    pageSize,
+  };
   return list;
 };
 
