@@ -73,6 +73,7 @@ export function useCrud(options) {
    * search
    */
   const handleSearch = () => {
+    console.log("🔍 搜索触发了！搜索内容：", searchForm); // 👈 只加这一行
     pagination.page = 1;
 
     fetchList();

@@ -11,7 +11,7 @@
 
       <el-form-item label="接收者">
         <el-select
-          v-model="formData.worker"
+          v-model="formData.workerId"
           placeholder="请选择接收者"
           style="width: 100%"
         >
@@ -43,7 +43,7 @@ const router = useRouter();
 const formData = ref({
   _id: "",
   title: "",
-  worker: "",
+  workerId: "",
 });
 const workerList = ref([]);
 
@@ -51,9 +51,7 @@ const handleSubmit = async () => {
   try {
     const id = route.params.id;
 
-    const workerId = formData.value.worker;
-
-    console.log("👉 workerId =", workerId);
+    const workerId = formData.value.workerId;
 
     if (!workerId) {
       ElMessage.warning("请选择接收者");
@@ -72,42 +70,28 @@ const handleSubmit = async () => {
 };
 const getTaskDetailData = async () => {
   try {
-    console.log("👉 1. 进入 getTaskDetailData");
-
     const id = route.params.id;
-    console.log("👉 2. route id =", id);
 
     if (!id) {
-      console.log("❌ 没有 id，直接 return");
       return;
     }
 
-    console.log("👉 3. 准备请求 getTaskDetail");
-
     const res = await getTaskDetail(id);
 
-    console.log("👉 4. 接口原始返回 res =", res);
-
     const task = res;
-
-    console.log("👉 5. task =", task);
 
     formData.value._id = task._id;
     formData.value.title = task.title;
 
-    console.log("👉 6. worker 原始值 =", task.worker);
-
-    formData.value.worker = task.worker?._id || task.worker || "";
-
-    console.log("👉 7. 最终 worker =", formData.value.worker);
+    formData.value.workerId = task.worker?._id || "";
   } catch (error) {
-    console.log("❌ catch 捕获错误 =", error);
+    console.log(error);
   }
 };
 const getWorkers = async () => {
   const res = await getUserList();
-  const list = res.list || [];
-  workerList.value = list.filter((u) => u.role === "worker");
+  const allUser = res.list || [];
+  workerList.value = allUser.filter((u) => u.role === "worker");
 };
 onMounted(async () => {
   await getTaskDetailData();

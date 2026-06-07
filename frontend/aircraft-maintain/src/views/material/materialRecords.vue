@@ -62,7 +62,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-//import { getTaskDetail } from "@/api/task";
+import { getMaterialDetail } from "@/api/material";
 
 const route = useRoute();
 
@@ -72,25 +72,17 @@ const loading = ref(false);
 const fetchDetail = async () => {
   loading.value = true;
 
-  setTimeout(() => {
-    detail.value = {
-      name: "螺丝",
-      stock: 100,
-      availableStock: 10,
-      quantity: "70",
-      distributor: {
-        username: "材料管理员",
-      },
-      receiver: {
-        username: "张三",
-      },
-      receiveAt: "2026-05-18 09:00:00",
-      createdAt: "2026-05-18 09:00:00",
-      updatedAt: "2026-05-18 09:00:00",
-    };
+  try {
+    const id = route.params.id;
 
+    const res = await getMaterialDetail(id);
+
+    detail.value = res;
+  } catch (error) {
+    console.log("获取物料详情失败:", error);
+  } finally {
     loading.value = false;
-  }, 500);
+  }
 };
 
 onMounted(() => {

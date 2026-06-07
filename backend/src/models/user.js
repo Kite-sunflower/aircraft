@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, '用户名不能为空'],
       minlength: [2, '用户名最少2个字符'],
-      maxlength: [10, '用户名最多6个字符'],
+      maxlength: [15, '用户名最多6个字符'],
       unique: true,
       trim: true,
       // 只允许中文、英文、数字

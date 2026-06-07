@@ -9,8 +9,8 @@ const {
 
 exports.getAllMaterial = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const materialData = await getAll(page, limit);
+    const { page = 1, pageSize = 10, name } = req.query;
+    const materialData = await getAll({ page, pageSize, name });
     res.sendSuccess(200, materialData, '获取材料列表成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
@@ -52,7 +52,7 @@ exports.deleteBatchMaterial = async (req, res) => {
   try {
     const { ids } = req.body;
     const result = await deleteBatch(ids);
-    res.sendSuccess(200, result, '删除材料成功');
+    res.sendSuccess(200, result, '批量删除材料成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

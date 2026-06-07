@@ -2,7 +2,7 @@
   <div class="layout-container">
     <!-- 左侧菜单 -->
     <div class="sidebar">
-      <div class="logo">aircraft Maintain</div>
+      <div class="logo">Aircraft Maintenance</div>
       <el-menu router>
         <el-menu-item
           v-for="item in showMenus"
@@ -57,7 +57,7 @@ const menus = [
   {
     title: "工作台",
     path: "/",
-    roles: ["admin"],
+    roles: ["admin", "worker", "toolManager", "materialManager"],
   },
   {
     title: "任务管理",
@@ -68,13 +68,13 @@ const menus = [
   {
     title: "工具管理",
     path: "/tool/list",
-    roles: ["admin", "toolDist"],
+    roles: ["admin", "toolManager"],
   },
 
   {
     title: "物料管理",
     path: "/material/list",
-    roles: ["admin", "materialsDist"],
+    roles: ["admin", "materialManager"],
   },
 
   {
@@ -118,6 +118,8 @@ const showMenus = computed(() => {
 /* 左侧菜单 */
 .sidebar {
   width: 220px;
+  min-width: 220px;
+  max-width: 220px;
   background: #001529;
   color: white;
 }
@@ -167,11 +169,14 @@ const showMenus = computed(() => {
 
   display: flex;
   align-items: center;
-  justify-content: center;
+
+  padding-left: 20px;
 
   font-size: 18px;
   font-weight: bold;
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  box-sizing: border-box;
 }
 </style>

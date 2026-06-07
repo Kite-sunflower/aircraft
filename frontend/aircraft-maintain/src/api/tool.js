@@ -17,6 +17,13 @@ export const getToolDetail = async (id) => {
     method: "get",
   });
 };
+// 获取工具记录详情
+export const getToolRecord = async (id) => {
+  return request({
+    url: `/toolRecords/${id}/toolRecord`,
+    method: "get",
+  });
+};
 /**
  * 新增工具
  */
@@ -62,7 +69,7 @@ export const batchDeleteTool = async (ids) => {
 //借工具
 export const borrowTool = async (id, data) => {
   return request({
-    url: `/tool/${id}/borrow`,
+    url: `/toolRecords/${id}/borrow`,
     method: "post",
     data,
   });
@@ -70,7 +77,7 @@ export const borrowTool = async (id, data) => {
 //还工具
 export const returnTool = async (id, data) => {
   return request({
-    url: `/tool/${id}/return`,
+    url: `/toolRecords/${id}/return`,
     method: "post",
   });
 };

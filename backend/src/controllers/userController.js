@@ -10,8 +10,8 @@ const {
 
 exports.getAllUser = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const userData = await getAll(page, limit);
+    const { page = 1, pageSize = 10, username, role } = req.query;
+    const userData = await getAll({ page, pageSize, username, role });
     res.sendSuccess(200, userData, '获取用户列表');
   } catch (error) {
     res.sendFail(400, null, error.message);
@@ -28,7 +28,13 @@ exports.getOneUser = async (req, res) => {
 };
 exports.createUser = async (req, res) => {
   try {
-    const newuser = await create(req.body);
+    const { username, password, role } = req.body;
+
+    const newuser = await create({
+      username,
+      password,
+      role,
+    });
     res.sendSuccess(201, newuser, '创建用户成功');
   } catch (error) {
     res.sendFail(400, null, error.message);

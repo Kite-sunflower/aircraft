@@ -12,13 +12,25 @@ export const getTaskList = async (params) => {
 
   return res.list;
 };
-// 获取任务详情
+/**
+ * 获取任务列表，工作台专用
+ */
+export const getDashboardTask = () => {
+  return request({
+    url: "/task/dashboard",
+    method: "get",
+  });
+};
+/**
+ * 获取任务详情
+ */
 export const getTaskDetail = async (id) => {
   return request({
     url: `/task/${id}`,
     method: "get",
   });
 };
+
 /**
  * 新增
  */
@@ -64,6 +76,14 @@ export const batchDeleteTask = async (ids) => {
 export const assignTask = async (id, data) => {
   return request({
     url: `/task/${id}/distribute`,
+    method: "put",
+    data,
+  });
+};
+//完成任务
+export const finishedTask = async (id, data) => {
+  return request({
+    url: `/task/${id}/finish`,
     method: "put",
     data,
   });

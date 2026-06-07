@@ -2,7 +2,7 @@ const {
   distribute,
   getAll,
   getOne,
-  getOneMaterial,
+  getOneMaterialId,
   deleteOne,
   deleteBatch,
 } = require('../services/materialReceiveService');
@@ -12,12 +12,12 @@ exports.distributeMaterial = async (req, res) => {
   try {
     const result = await distribute(
       req.params.materialId,
-      req.body.receiver,
+      req.body.receiverId,
       req.body.quantity,
       req.user._id
     );
 
-    res.sendSuccess(200, result, '发放物料成功');
+    res.sendSuccess(201, result, '发放物料成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
@@ -32,7 +32,7 @@ exports.getAllRecords = async (req, res) => {
 
     const result = await getAll(page, pageSize);
 
-    res.sendSuccess(200, result, '获取材料发放记录成功');
+    res.sendSuccess(200, result, '获取材料发放记录列表成功');
   } catch (err) {
     res.sendFail(400, null, err.message);
   }
@@ -42,17 +42,16 @@ exports.getAllRecords = async (req, res) => {
 exports.getOneRecords = async (req, res) => {
   try {
     const result = await getOne(req.params.id);
-    res.sendSuccess(200, result, '获取成功');
+    res.sendSuccess(200, result, '获取单挑材料记录成功');
   } catch (err) {
     res.sendFail(400, null, err.message);
   }
 };
-//
-// 根据材料id获取单条
+
 // 根据材料id获取记录（分页版）
 exports.getOneMaterialIdRecords = async (req, res) => {
   try {
-    const materialId = req.params.id;
+    const materialId = req.params.materialId;
     // 从前端接收分页参数，给默认值（最规范）
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
@@ -60,7 +59,7 @@ exports.getOneMaterialIdRecords = async (req, res) => {
     // 把分页参数传给 service
     const result = await getOneMaterialId(materialId, page, pageSize);
 
-    res.sendSuccess(200, result, '获取成功');
+    res.sendSuccess(200, result, '根据材料id获取发放记录成功');
   } catch (err) {
     res.sendFail(400, null, err.message);
   }
@@ -70,7 +69,7 @@ exports.getOneMaterialIdRecords = async (req, res) => {
 exports.deleteOneRecords = async (req, res) => {
   try {
     const result = await deleteOne(req.params.id);
-    res.sendSuccess(200, result, '删除成功');
+    res.sendSuccess(200, result, '材料记录删除成功');
   } catch (err) {
     res.sendFail(400, null, err.message);
   }

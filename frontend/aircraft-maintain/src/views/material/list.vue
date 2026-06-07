@@ -111,7 +111,7 @@ import { formatTime } from "@/utils/format";
 const router = useRouter();
 
 const handleView = (row) => {
-  router.push(`/material/detail/${row._id}`);
+  router.push(`/material/materialRecords/${row._id}`);
 };
 const handleAssign = (row) => {
   router.push(`/material/assign/${row._id}`);

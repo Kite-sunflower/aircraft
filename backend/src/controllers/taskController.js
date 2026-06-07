@@ -1,5 +1,6 @@
 const {
   getAll,
+  getDashboard,
   getOne,
   create,
   update,
@@ -11,9 +12,18 @@ const {
 
 exports.getAllTask = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const taskData = await getAll(page, limit);
+    const { page = 1, pageSize = 10, title, status } = req.query;
+    const taskData = await getAll({ page, pageSize, title, status }, req.user);
     res.sendSuccess(200, taskData, '获取任务列表成功');
+  } catch (error) {
+    console.log(error);
+    res.sendFail(400, null, error.message);
+  }
+};
+exports.getDashboardTask = async (req, res) => {
+  try {
+    const data = await getDashboard();
+    res.sendSuccess(200, data, '获取工作台数据成功');
   } catch (error) {
     console.log(error);
     res.sendFail(400, null, error.message);
@@ -30,7 +40,7 @@ exports.getOneTask = async (req, res) => {
 exports.createTask = async (req, res) => {
   try {
     const newTask = await create(req.body, req.user.id);
-    res.sendSuccess(200, newTask, '创建任务成功');
+    res.sendSuccess(201, newTask, '创建任务成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }

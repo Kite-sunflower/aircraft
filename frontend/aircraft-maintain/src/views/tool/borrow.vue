@@ -21,26 +21,19 @@
           style="width: 100%"
         />
       </el-form-item>
-      <el-form-item label="工具管理员">
-        <el-select
-          v-model="formData.lender"
-          placeholder="请选择工具管理员"
-          style="width: 100%"
-        >
-          <el-option label="张三" value="1" />
 
-          <el-option label="李四" value="2" />
-        </el-select>
-      </el-form-item>
       <el-form-item label="借用者">
         <el-select
           v-model="formData.borrower"
           placeholder="请选择借用者"
           style="width: 100%"
         >
-          <el-option label="张三" value="1" />
-
-          <el-option label="李四" value="2" />
+          <el-option
+            v-for="item in userList"
+            :key="item._id"
+            :label="item.username"
+            :value="item._id"
+          />
         </el-select>
       </el-form-item>
 
@@ -55,6 +48,8 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { getUserList } from "@/api/user";
+import { getToolDetail, borrowTool } from "@/api/tool";
 
 const route = useRoute();
 const router = useRouter();
@@ -67,20 +62,43 @@ const formData = ref({
   lender: "",
   borrower: "",
 });
-const handleSubmit = () => {
+
+const userList = ref([]);
+
+const fetchDetail = async () => {
+  const id = route.params.id;
+
+  const res = await getToolDetail(id);
+
+  formData.value._id = res._id;
+  formData.value.name = res.name;
+  formData.value.availableStock = res.availableStock;
+  formData.value.quantity = 1;
+};
+
+const fetchUsers = async () => {
+  const res = await getUserList();
+
+  userList.value = res.list || [];
+};
+
+const handleSubmit = async () => {
+  if (!formData.value.borrower) {
+    ElMessage.warning("请选择借用者");
+    return;
+  }
+
+  await borrowTool(formData.value._id, {
+    quantity: formData.value.quantity,
+    borrower: formData.value.borrower,
+  });
+
   ElMessage.success("出借成功");
 
   router.push("/tool/list");
 };
-onMounted(() => {
-  // mock 数据
-  formData.value = {
-    _id: route.params.id,
-    name: "螺丝刀",
-    availableStock: 10,
-    quantity: 1,
-    lender: "1",
-    borrower: "2",
-  };
+onMounted(async () => {
+  await fetchDetail();
+  await fetchUsers();
 });
 </script>

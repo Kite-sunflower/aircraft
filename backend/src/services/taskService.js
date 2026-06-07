@@ -1,9 +1,36 @@
 const Task = require('../models/task');
 const User = require('../models/user');
 const pagination = require('../utils/pagination');
+const buildQuery = require('../utils/buildQuery');
 
-exports.getAll = async (page, limit) => {
-  return await pagination(Task, page, limit);
+exports.getAll = async (params, user) => {
+  const query = buildQuery(
+    {
+      title: 'fuzzy',
+      status: 'exact',
+    },
+    params
+  );
+  if (user.role === 'worker') {
+    query.worker = user._id;
+  }
+  return await pagination({
+    Model: Task,
+
+    page: params.page,
+    pageSize: params.pageSize,
+
+    query,
+  });
+};
+//给工作台单独使用
+exports.getDashboard = async (params) => {
+  return await pagination({
+    Model: Task,
+    page: 1,
+    pageSize: 10,
+    query: {}, // 不做任何角色过滤
+  });
 };
 
 exports.getOne = async (id) => {
@@ -14,7 +41,7 @@ exports.getOne = async (id) => {
   return task;
 };
 
-exports.create = async (taskData, creatorId) => {
+exports.create = async (taskData, creator) => {
   const { title, description } = taskData;
   if (!title?.trim() || !description?.trim()) {
     throw new Error('任务和描述不能为空');
@@ -25,7 +52,7 @@ exports.create = async (taskData, creatorId) => {
   }
   return await Task.create({
     ...taskData,
-    creator: creatorId,
+    creator: creator,
   });
 };
 
@@ -77,13 +104,13 @@ exports.deleteBatch = async (ids) => {
 
   const result = await Task.deleteMany({ _id: { $in: ids } });
   return {
-    deletdCount: result.deletedCount,
+    deletedCount: result.deletedCount,
   };
 };
 
 //核心逻辑
 //分配任务
-exports.distribute = async (taskId, workerId, managerId) => {
+exports.distribute = async (taskId, workerId, manager) => {
   const task = await Task.findById(taskId);
 
   if (!task) {
@@ -100,8 +127,8 @@ exports.distribute = async (taskId, workerId, managerId) => {
   if (task.status !== 'pending') {
     throw new Error('只有待处理任务才能分配');
   }
-  task.manager = managerId;
-  task.worker = workerId;
+  task.manager = manager;
+  task.worker = worker;
 
   task.assignedAt = new Date();
 

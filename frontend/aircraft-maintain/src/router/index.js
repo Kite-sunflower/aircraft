@@ -12,14 +12,15 @@ const routes = [
   {
     path: "/",
     component: Layout,
+    redirect: "/home",
     children: [
       {
-        path: "",
-        name: "dashboard",
+        path: "home",
+        name: "home",
         component: () => import("@/views/dashboard/index.vue"),
         meta: {
-          tite: "工作台",
-          roles: ["admin"],
+          title: "工作台",
+          roles: ["admin", "worker", "toolManager", "materialManager"],
         },
       },
 
@@ -54,15 +55,15 @@ const routes = [
         component: () => import("@/views/tool/list.vue"),
         meta: {
           title: "工具管理",
-          roles: ["admin", "toolDist"],
+          roles: ["admin", "toolManager"],
         },
       },
       {
-        path: "tool/detail/:id",
-        name: "ToolDetail",
-        component: () => import("@/views/tool/detail.vue"),
+        path: "tool/toolRecords/:id",
+        name: "ToolRecords",
+        component: () => import("@/views/tool/toolRecords.vue"),
         meta: {
-          title: "工具详情",
+          title: "工具记录详情",
         },
       },
       {
@@ -96,15 +97,15 @@ const routes = [
         component: () => import("@/views/material/list.vue"),
         meta: {
           title: "物料管理",
-          roles: ["admin", "materialsDist"],
+          roles: ["admin", "materialManager"],
         },
       },
       {
-        path: "material/detail/:id",
-        name: "MaterialDetail",
-        component: () => import("@/views/material/detail.vue"),
+        path: "material/materialRecords/:id",
+        name: "MaterialRecords",
+        component: () => import("@/views/material/materialRecords.vue"),
         meta: {
-          title: "物料详情",
+          title: "物料记录详情",
         },
       },
       {
@@ -128,7 +129,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const userStore = useUserStore();
   const token = userStore.token;
-
+  const role = userStore.userInfo?.role;
   //  未登录
   if (!token) {
     if (to.path !== "/login") {
@@ -137,18 +138,16 @@ router.beforeEach((to) => {
     return true;
   }
 
-  // ✔ 已登录：允许访问所有页面（包括 login）
-  if (to.path === "/login") {
-    return "/";
+  // ✔ 已登录：不允许访问login页面
+  if (token && to.path === "/login") {
+    return { path: "/" };
   }
 
-  // 权限控制
-  const role = userStore.userInfo?.role;
   const roles = to.meta?.roles;
 
   if (roles && !roles.includes(role)) {
     ElMessage.error("没有访问权限");
-    return "/";
+    return false;
   }
 
   return true;

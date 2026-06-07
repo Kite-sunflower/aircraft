@@ -1,12 +1,29 @@
-async function pagination(Model, page, pageSize, sortObj = { createdAt: -1 }) {
+async function pagination({
+  Model,
+  page = 1,
+  pageSize = 10,
+  query = {},
+  sortObj = { createdAt: -1 },
+  populate = '',
+}) {
   page = parseInt(page);
   pageSize = parseInt(pageSize);
 
   const skip = (page - 1) * pageSize;
 
-  const list = await Model.find().sort(sortObj).skip(skip).limit(pageSize);
+  let dbQuery = Model.find(query).sort(sortObj).skip(skip).limit(pageSize);
 
-  const total = await Model.countDocuments();
+  if (populate) {
+    if (Array.isArray(populate)) {
+      populate.forEach((item) => {
+        dbQuery = dbQuery.populate(item);
+      });
+    } else {
+      dbQuery = dbQuery.populate(populate);
+    }
+  }
+  const list = await dbQuery;
+  const total = await Model.countDocuments(query);
 
   return {
     list,

@@ -1,9 +1,25 @@
 const User = require('../models/user');
 
 const pagination = require('../utils/pagination');
+const buildQuery = require('../utils/buildQuery');
 
-exports.getAll = async (page, limit) => {
-  return await pagination(User, page, limit);
+exports.getAll = async (params) => {
+  const query = buildQuery(
+    {
+      username: 'fuzzy',
+      role: 'exact',
+    },
+    params
+  );
+
+  return await pagination({
+    Model: User,
+
+    page: params.page,
+    pageSize: params.pageSize,
+
+    query,
+  });
 };
 exports.getOne = async (id) => {
   const user = await User.findById(id);
@@ -14,7 +30,7 @@ exports.getOne = async (id) => {
 };
 
 exports.create = async (userData) => {
-  const { username, password } = userData;
+  const { username, password, role } = userData;
 
   // 非空校验
   if (!username?.trim() || !password?.trim()) {
@@ -32,11 +48,17 @@ exports.create = async (userData) => {
   if (user) {
     throw new Error('创建的用户已存在');
   }
+  // 角色判断
+  const allowRoles = ['admin', 'worker', 'toolManager', 'materialManager'];
 
+  if (!allowRoles.includes(role)) {
+    throw new Error('非法角色类型');
+  }
   // 创建用户
   return await User.create({
     username,
     password,
+    role,
   });
 };
 exports.update = async (id, updateData) => {

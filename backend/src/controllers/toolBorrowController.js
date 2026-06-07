@@ -20,7 +20,7 @@ exports.borrowToolRecord = async (req, res) => {
       quantity,
     });
 
-    res.sendSuccess(200, result, '借用工具成功');
+    res.sendSuccess(201, result, '借用工具成功');
   } catch (error) {
     res.sendFail(400, null, error.message);
   }
@@ -49,7 +49,7 @@ exports.getAllRecord = async (req, res) => {
 
     const result = await getAll(page, pageSize);
 
-    res.sendSuccess(200, result, '获取借用记录成功');
+    res.sendSuccess(200, result, '获取借用记录列表成功');
   } catch (err) {
     res.sendFail(400, null, err.message);
   }
@@ -60,7 +60,7 @@ exports.getOneRecord = async (req, res) => {
   try {
     const result = await getOne(req.params.id);
 
-    res.sendSuccess(200, result, '获取借用记录成功');
+    res.sendSuccess(200, result, '获取单条借用记录成功');
   } catch (err) {
     res.sendFail(400, null, err.message);
   }
@@ -78,7 +78,7 @@ exports.getOneToolIdRecord = async (req, res) => {
     // 把 3 个参数全部传给 service
     const result = await getOneToolId(toolId, page, pageSize);
 
-    res.sendSuccess(200, result, '获取工具借用记录成功');
+    res.sendSuccess(200, result, '根据工具id获取借用记录成功');
   } catch (err) {
     res.sendFail(400, null, err.message);
   }

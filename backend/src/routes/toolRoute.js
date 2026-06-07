@@ -12,7 +12,7 @@ const {
 
 const { protect, admin, toolManager } = require('../middleware/auth');
 
-router.delete('/batch/delete', protect, admin, deleteBatchTool);
+router.post('/batch/delete', protect, admin, deleteBatchTool);
 router.get('/', protect, getAllTool);
 router.get('/:id', protect, getOneTool);
 router.post('/create', protect, admin, createTool);

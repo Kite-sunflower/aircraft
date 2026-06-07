@@ -61,7 +61,7 @@
           </el-table-column>
           <el-table-column label="创建时间">
             <template #default="{ row }">
-              {{ formatDateTime(row.createdAt) }}
+              {{ formatTime(row.createdAt) }}
             </template>
           </el-table-column>
         </el-table>
@@ -73,7 +73,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
-import { getTaskList } from "@/api/task";
+import { getDashboardTask } from "@/api/task";
 import { getUserList } from "@/api/user";
 import { getToolList } from "@/api/tool";
 import { getMaterialList } from "@/api/material";
@@ -89,21 +89,24 @@ const stats = ref({
 const tableData = ref([]);
 
 const fetchDashboard = async () => {
-  const [tasks, users, tools, materials] = await Promise.all([
-    getTaskList(),
+  const [tasksRes, usersRes, toolsRes, materialsRes] = await Promise.all([
+    getDashboardTask(),
     getUserList(),
     getToolList(),
     getMaterialList(),
   ]);
 
+  const tasks = tasksRes.list || [];
+  const users = usersRes.list || [];
+  const tools = toolsRes.list || [];
+  const materials = materialsRes.list || [];
   // 统计
   stats.value = {
-    taskCount: tasks.length,
-    userCount: users.length,
-    toolCount: tools.length,
-    materialCount: materials.length,
+    taskCount: tasksRes.total || tasks.length,
+    userCount: usersRes.total || users.length,
+    toolCount: toolsRes.total || tools.length,
+    materialCount: materialsRes.total || materials.length,
   };
-
   // 最近任务
   tableData.value = tasks.slice(0, 10);
 };

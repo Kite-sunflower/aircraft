@@ -14,7 +14,7 @@ const {
 const { protect, admin, onlySelf } = require('../middleware/auth');
 
 router.post('/batch/delete', protect, admin, deleteBatchUser);
-router.get('/', protect, admin, getAllUser);
+router.get('/', protect, getAllUser);
 router.get('/:id', protect, onlySelf, getOneUser);
 router.post('/create', protect, admin, createUser);
 router.put('/:id/update', protect, onlySelf, updateUser);

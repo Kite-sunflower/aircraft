@@ -2,11 +2,11 @@ const Material = require('../models/material');
 const MaterialReceiveRecord = require('../models/materialReceiveRecord');
 
 // 发放物料
-exports.distribute = async (materialId, receiver, quantity, distributor) => {
+exports.distribute = async (materialId, receiverId, quantity, distributor) => {
   if (!materialId) {
     throw new Error('材料ID不能为空');
   }
-  if (!receiver) {
+  if (!receiverId) {
     throw new Error('领取人不能为空');
   }
   if (!distributor) {
@@ -34,7 +34,7 @@ exports.distribute = async (materialId, receiver, quantity, distributor) => {
   const record = await MaterialReceiveRecord.create({
     material: materialId,
     distributor: distributor,
-    receiver: receiver,
+    receiver: receiverId,
     quantity,
   });
 
@@ -109,7 +109,6 @@ exports.getOneMaterialId = async (materialId, page = 1, pageSize = 10) => {
     page,
     pageSize,
   };
-  return list;
 };
 
 // 删除记录

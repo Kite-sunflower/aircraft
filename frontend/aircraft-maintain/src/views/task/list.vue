@@ -36,7 +36,13 @@
             批量删除
           </el-button>
 
-          <el-button type="primary" @click="handleCreate"> 新建任务 </el-button>
+          <el-button
+            type="primary"
+            @click="handleCreate"
+            :disabled="userStore.userInfo.role !== 'admin'"
+          >
+            新建任务
+          </el-button>
         </div>
       </div>
     </el-card>
@@ -72,19 +78,41 @@
 
         <!-- 操作 -->
         <template #action="{ row }">
-          <el-button type="primary" link @click="handleEdit(row)">
-            编辑
-          </el-button>
+          <div class="table-actions">
+            <!-- admin：全部权限 -->
+            <template v-if="userStore.userInfo.role === 'admin'">
+              <el-button type="primary" link @click="handleEdit(row)">
+                编辑
+              </el-button>
 
-          <el-button type="success" link @click="handleAssign(row)">
-            分配
-          </el-button>
-          <el-button type="primary" link @click="handleView(row)">
-            查看</el-button
-          >
-          <el-button type="danger" link @click="handleDelete(row._id)">
-            删除
-          </el-button>
+              <el-button type="success" link @click="handleAssign(row)">
+                分配
+              </el-button>
+
+              <el-button type="primary" link @click="handleView(row)">
+                查看
+              </el-button>
+
+              <el-button type="danger" link @click="handleDelete(row._id)">
+                删除
+              </el-button>
+            </template>
+
+            <!-- worker：只保留完成 -->
+            <template v-else-if="userStore.userInfo.role === 'worker'">
+              <el-button type="primary" link @click="handleView(row)">
+                查看
+              </el-button>
+              <el-button
+                type="success"
+                link
+                :disabled="row.status === 'finished'"
+                @click="handleComplete(row)"
+              >
+                完成
+              </el-button>
+            </template>
+          </div>
         </template>
       </CrudTable>
     </el-card>
@@ -139,6 +167,10 @@ import {
 import { useCrud } from "@/composables/useCrud";
 import { useDialog } from "@/composables/useDialog";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/store/modules/user";
+import { finishedTask } from "@/api/task";
+import { ElMessage } from "element-plus";
+const userStore = useUserStore();
 
 import { formatTime } from "@/utils/format";
 
@@ -247,6 +279,19 @@ const columns = [
     slot: "createdAt",
   },
 ];
+const handleComplete = async (row) => {
+  try {
+    await finishedTask(row._id, {
+      status: "finished",
+    });
+
+    ElMessage.success("任务已完成");
+
+    await fetchList();
+  } catch (err) {
+    ElMessage.error("操作失败");
+  }
+};
 onMounted(() => {
   console.log("task页面 mounted");
   fetchList();

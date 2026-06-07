@@ -25,13 +25,16 @@
 
       <el-form-item label="领取者">
         <el-select
-          v-model="formData.receiver"
+          v-model="formData.receiverId"
           placeholder="请选择领取者"
           style="width: 100%"
         >
-          <el-option label="张三" value="1" />
-
-          <el-option label="李四" value="2" />
+          <el-option
+            v-for="item in userList"
+            :key="item._id"
+            :label="item.username"
+            :value="item._id"
+          />
         </el-select>
       </el-form-item>
 
@@ -46,6 +49,8 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import { getMaterialDetail, assignMaterial } from "@/api/material";
+import { getUserList } from "@/api/user";
 
 const route = useRoute();
 const router = useRouter();
@@ -55,22 +60,43 @@ const formData = ref({
   name: "",
   availableStock: 0,
   quantity: 1,
-  receiver: "",
+  receiverId: "",
 });
 
-const handleSubmit = () => {
-  ElMessage.success("发放成功");
+const userList = ref([]);
 
+const handleSubmit = async () => {
+  console.log("提交数据:", formData.value);
+  if (!formData.value.receiverId) {
+    ElMessage.warning("请选择领取者");
+    return;
+  }
+
+  await assignMaterial(formData.value._id, {
+    quantity: formData.value.quantity,
+    receiverId: formData.value.receiverId,
+  });
+
+  ElMessage.success("发放成功");
   router.push("/material/list");
 };
-onMounted(() => {
-  // mock 数据
-  formData.value = {
-    _id: route.params.id,
-    name: "螺丝",
-    availableStock: 10,
-    quantity: 10,
-    receiver: "1",
-  };
+const fetchDetail = async () => {
+  const id = route.params.id;
+  if (!id) return;
+  const res = await getMaterialDetail(id);
+
+  formData.value._id = res._id;
+  formData.value.name = res.name;
+  formData.value.availableStock = res.availableStock;
+  formData.value.quantity = 1;
+};
+const fetchUsers = async () => {
+  const res = await getUserList();
+
+  userList.value = (res.list || []).filter((u) => u.role === "worker");
+};
+onMounted(async () => {
+  await fetchDetail();
+  await fetchUsers();
 });
 </script>

@@ -66,8 +66,8 @@ const rules = {
     },
     {
       min: 2,
-      max: 6,
-      message: "用户名长度为 2-6 位",
+      max: 15,
+      message: "用户名长度为 2-15 位",
       trigger: "blur",
     },
     {
@@ -103,11 +103,10 @@ const handleLogin = async () => {
 
   try {
     const res = await loginApi(loginForm);
-
     userStore.setUserInfo(res.token, res.userInfo);
     ElMessage.success("登录成功");
 
-    router.push("/");
+    router.replace("/");
   } catch (error) {
     ElMessage.error(error.response?.data?.message || "登录失败");
   }

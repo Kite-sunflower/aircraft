@@ -10,7 +10,7 @@ export const getMaterialList = async (params) => {
     params,
   });
 };
-// 获取任务详情
+// 获取材料详情
 export const getMaterialDetail = async (id) => {
   return request({
     url: `/material/${id}`,
@@ -33,7 +33,7 @@ export const createMaterial = async (data) => {
  */
 export const updateMaterial = async (id, data) => {
   return request({
-    url: `/material/${id}`,
+    url: `/material/${id}/update`,
     method: "put",
     data,
   });
@@ -44,7 +44,7 @@ export const updateMaterial = async (id, data) => {
  */
 export const deleteMaterial = async (id) => {
   return request({
-    url: `/material/${id}`,
+    url: `/material/${id}/delete`,
     method: "delete",
   });
 };
@@ -55,15 +55,15 @@ export const deleteMaterial = async (id) => {
 export const batchDeleteMaterial = async (ids) => {
   return request({
     url: `/material/batch/delete`,
-    method: "delete",
+    method: "post",
     data: { ids },
   });
 };
 //发放材料
 export const assignMaterial = async (id, data) => {
   return request({
-    url: `/material/${id}/distribute`,
+    url: `/materialRecords/${id}/distribute`,
     method: "post",
-    data: { ids },
+    data,
   });
 };

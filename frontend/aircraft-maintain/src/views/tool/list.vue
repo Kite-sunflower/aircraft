@@ -146,7 +146,7 @@ import { formatTime } from "@/utils/format";
 const router = useRouter();
 
 const handleView = (row) => {
-  router.push(`/tool/detail/${row._id}`);
+  router.push(`/tool/toolRecords/${row._id}`);
 };
 const handleBorrow = (row) => {
   router.push(`/tool/borrow/${row._id}`);
