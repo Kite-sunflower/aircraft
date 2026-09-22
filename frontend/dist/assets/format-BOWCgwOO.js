@@ -1,0 +1,1 @@
+import{i as e,j as t}from"./index-NvTX6GkR.js";var n=t(e(),1),r=e=>e?(0,n.default)(e).format(`YYYY-MM-DD HH:mm:ss`):`-`;export{r as t};

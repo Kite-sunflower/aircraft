@@ -1,0 +1,1 @@
+import{t as e}from"./request-C282fkIi.js";var t=async t=>e({url:`/user`,method:`get`,params:t}),n=async t=>e({url:`/user/create`,method:`post`,data:t}),r=async(t,n)=>e({url:`/user/${t}/update`,method:`put`,data:n}),i=async t=>e({url:`/user/${t}/delete`,method:`delete`}),a=async t=>e({url:`/user/batch/delete`,method:`post`,data:{ids:t}});export{r as a,t as i,n,i as r,a as t};
