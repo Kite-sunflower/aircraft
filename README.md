@@ -1,6 +1,12 @@
 
 # ✈️ 飞机维修任务管理系统
 > 面向飞机维修场景的任务管控平台，支持维修任务下发、工具借用、航材申领、任务全流程跟踪。
+- 前端访问地址：https://aircraft-maintain.netlify.app
+- 后端api地址：aircraft-backend.up.railway.app
+- 前端部署平台:Netlify
+- 后端部署平台：Railway
+- 数据库托管平台：MongoDB Atlas
+-  代码托管平台：Github
 
 ## 📦 系统模块
 - 任务模块
