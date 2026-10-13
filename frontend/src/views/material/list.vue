@@ -18,6 +18,14 @@
 
         <div class="right">
           <el-button
+            type="primary"
+            plain
+            :loading="printLoading"
+            @click="handlePrint"
+          >
+            打印列表
+          </el-button>
+          <el-button
             type="danger"
             @click="handleBatchDelete"
             :disabled="!selectedIds.length"
@@ -103,6 +111,7 @@ import {
   updateMaterial,
 } from "@/api/material";
 import { useCrud } from "@/composables/useCrud";
+import { usePrintList } from "@/composables/usePrintList";
 import { useDialog } from "@/composables/useDialog";
 import { useRouter } from "vue-router";
 
@@ -211,6 +220,16 @@ const columns = [
     slot: "createdAt",
   },
 ];
+const { handlePrint, printLoading } = usePrintList({
+  title: "物料管理清单",
+  getList: getMaterialList,
+  searchForm,
+  pagination,
+  columns,
+  formatters: {
+    createdAt: (value) => formatTime(value),
+  },
+});
 onMounted(() => {
   fetchList();
 });

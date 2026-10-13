@@ -29,6 +29,15 @@
 
         <div class="right">
           <el-button
+            type="primary"
+            plain
+            :loading="printLoading"
+            @click="handlePrint"
+          >
+            打印列表
+          </el-button>
+
+          <el-button
             type="danger"
             @click="handleBatchDelete"
             :disabled="!selectedIds.length"
@@ -165,6 +174,7 @@ import {
   updateTask,
 } from "@/api/task";
 import { useCrud } from "@/composables/useCrud";
+import { usePrintList } from "@/composables/usePrintList";
 import { useDialog } from "@/composables/useDialog";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/modules/user";
@@ -279,6 +289,25 @@ const columns = [
     slot: "createdAt",
   },
 ];
+const { handlePrint, printLoading } = usePrintList({
+  title: "任务管理清单",
+  getList: getTaskList,
+  searchForm,
+  pagination,
+  columns,
+  formatters: {
+    status: (value) => {
+      const statusLabels = {
+        pending: "待处理",
+        doing: "进行中",
+        finished: "已完成",
+      };
+
+      return statusLabels[value] || value || "";
+    },
+    createdAt: (value) => formatTime(value),
+  },
+});
 const handleComplete = async (row) => {
   try {
     await finishedTask(row._id, {
