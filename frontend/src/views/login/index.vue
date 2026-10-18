@@ -85,12 +85,12 @@ const rules = {
     },
     {
       min: 4,
-      max: 8,
-      message: "密码长度为 4-8 位",
+      max: 12,
+      message: "密码长度为 4-12 位",
       trigger: "blur",
     },
     {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d)/,
+      pattern: /^(?=.*[A-Za-z])(?=.*\d).+$/,
       message: "密码必须包含字母和数字",
       trigger: "blur",
     },
