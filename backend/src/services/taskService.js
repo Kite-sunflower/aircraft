@@ -51,7 +51,9 @@ exports.create = async (taskData, creator) => {
     throw new Error('任务已存在');
   }
   return await Task.create({
-    ...taskData,
+    title: title.trim(),
+    description: description.trim(),
+    status: 'pending',
     creator: creator,
   });
 };
