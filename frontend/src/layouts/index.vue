@@ -21,7 +21,9 @@
         <div class="header-left">{{ pageTitle }}</div>
         <div class="header-right">
           <el-dropdown>
-            <span class="dropdown-link"> Admin ▼</span>
+            <span class="dropdown-link">
+              {{ userStore.userInfo?.username || "Admin" }} ▼</span
+            >
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item divided @click="handleLogout">
