@@ -15,7 +15,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, '密码不能为空'],
-      minlength: [6, '密码至少6位'],
+      minlength: [4, '密码至少4位'],
+      maxlength: [20, '密码至多20位'],
       validate: {
         validator: function (v) {
           return /^(?=.*[A-Za-z])(?=.*\d)/.test(v);
