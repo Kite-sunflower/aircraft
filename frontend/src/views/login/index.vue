@@ -85,8 +85,8 @@ const rules = {
     },
     {
       min: 4,
-      max: 12,
-      message: "密码长度为 4-12 位",
+      max: 20,
+      message: "密码长度为 4-20 位",
       trigger: "blur",
     },
     {
