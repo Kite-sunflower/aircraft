@@ -144,13 +144,6 @@
           placeholder="请输入任务描述"
         />
       </el-form-item>
-      <el-form-item label="任务状态">
-        <el-select v-model="formData.status" style="width: 100%">
-          <el-option label="待处理" value="pending" />
-          <el-option label="进行中" value="doing" />
-          <el-option label="已完成" value="finished" />
-        </el-select>
-      </el-form-item>
     </el-form>
 
     <template #footer>
