@@ -114,6 +114,7 @@
         <el-input-number
           v-model="formData.stock"
           :min="0"
+          :max="9999"
           style="width: 100%"
         />
       </el-form-item>
@@ -195,6 +196,13 @@ const rules = {
     {
       required: true,
       message: "请输入库存",
+      trigger: "blur",
+    },
+    {
+      type: "number",
+      min: 0,
+      max: 999,
+      message: "库存范围 0~999",
       trigger: "blur",
     },
   ],
