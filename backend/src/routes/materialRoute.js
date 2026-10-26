@@ -15,7 +15,7 @@ const { protect, admin, materialManager } = require('../middleware/auth');
 router.post('/batch/delete', protect, admin, deleteBatchMaterial);
 router.get('/', protect, getAllMaterial);
 router.get('/:id', protect, getOneMaterial);
-router.post('/create', protect, admin, createMaterial);
+router.post('/create', protect, materialManager, createMaterial);
 router.put('/:id/update', protect, materialManager, updateMaterial);
 router.delete('/:id/delete', protect, admin, deleteMaterial);
 

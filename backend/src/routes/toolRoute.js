@@ -15,7 +15,7 @@ const { protect, admin, toolManager } = require('../middleware/auth');
 router.post('/batch/delete', protect, admin, deleteBatchTool);
 router.get('/', protect, getAllTool);
 router.get('/:id', protect, getOneTool);
-router.post('/create', protect, admin, createTool);
+router.post('/create', protect, toolManager, createTool);
 router.put('/:id/update', protect, toolManager, updateTool);
 router.delete('/:id/delete', protect, admin, deleteTool);
 
