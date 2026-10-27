@@ -78,6 +78,7 @@ export const borrowTool = async (id, data) => {
 export const returnTool = async (id, data) => {
   return request({
     url: `/toolRecords/${id}/return`,
-    method: "post",
+    method: "put",
+    data,
   });
 };

@@ -12,6 +12,7 @@
       <el-form-item label="可用库存">
         <el-input v-model="formData.availableStock" disabled />
       </el-form-item>
+
       <el-form-item label="出借数量">
         <el-input-number
           v-if="formData.availableStock > 0"
@@ -20,6 +21,12 @@
           :max="formData.availableStock"
           style="width: 100%"
         />
+        <el-alert
+          v-else
+          title="当前没有可用库存，无法出借"
+          type="warning"
+          :closable="false"
+        />
       </el-form-item>
 
       <el-form-item label="借用者">
@@ -27,6 +34,7 @@
           v-model="formData.borrower"
           placeholder="请选择借用者"
           style="width: 100%"
+          filterable
         >
           <el-option
             v-for="item in userList"
@@ -38,7 +46,14 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="handleSubmit"> 确认出借 </el-button>
+        <el-button
+          type="primary"
+          :loading="submitting"
+          :disabled="formData.availableStock <= 0"
+          @click="handleSubmit"
+        >
+          确认出借
+        </el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -59,16 +74,14 @@ const formData = ref({
   name: "",
   availableStock: 0,
   quantity: 1,
-  lender: "",
   borrower: "",
 });
 
 const userList = ref([]);
+const submitting = ref(false);
 
 const fetchDetail = async () => {
-  const id = route.params.id;
-
-  const res = await getToolDetail(id);
+  const res = await getToolDetail(route.params.id);
 
   formData.value._id = res._id;
   formData.value.name = res.name;
@@ -78,27 +91,47 @@ const fetchDetail = async () => {
 
 const fetchUsers = async () => {
   const res = await getUserList();
-
   userList.value = res.list || [];
 };
 
 const handleSubmit = async () => {
+  if (submitting.value) return;
+
   if (!formData.value.borrower) {
     ElMessage.warning("请选择借用者");
     return;
   }
 
-  await borrowTool(formData.value._id, {
-    quantity: formData.value.quantity,
-    borrower: formData.value.borrower,
-  });
+  if (
+    formData.value.quantity < 1 ||
+    formData.value.quantity > formData.value.availableStock
+  ) {
+    ElMessage.warning("出借数量不能超过可用库存");
+    return;
+  }
 
-  ElMessage.success("出借成功");
+  try {
+    submitting.value = true;
 
-  router.push("/tool/list");
+    await borrowTool(formData.value._id, {
+      quantity: formData.value.quantity,
+      borrower: formData.value.borrower,
+    });
+
+    ElMessage.success("出借成功");
+    await router.push("/tool/list");
+  } catch (error) {
+    console.error("出借工具失败：", error);
+  } finally {
+    submitting.value = false;
+  }
 };
+
 onMounted(async () => {
-  await fetchDetail();
-  await fetchUsers();
+  try {
+    await Promise.all([fetchDetail(), fetchUsers()]);
+  } catch (error) {
+    console.error("加载出借页面失败：", error);
+  }
 });
 </script>

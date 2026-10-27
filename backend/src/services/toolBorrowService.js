@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Tool = require('../models/tool');
 const ToolBorrowRecord = require('../models/toolBorrowRecord');
 
@@ -16,90 +17,134 @@ exports.borrowTool = async ({ toolId, borrower, lender, quantity }) => {
     throw new Error('出借人不能为空');
   }
 
-  if (!quantity || quantity <= 0) {
-    throw new Error('借用数量非法');
+  const amount = Number(quantity);
+
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new Error('借用数量必须是正整数');
   }
 
-  //并发安全锁
-  const tool = await Tool.findOneAndUpdate(
-    {
-      _id: toolId,
-      status: 'available',
-      availableStock: { $gte: quantity }, // 库存必须 >= 借用数量
-      stock: { $gte: quantity }, // 借用数量不能 > 总库存
-    },
-    {
-      $inc: { availableStock: -quantity }, // 原子扣减（并发安全）
-    },
-    { new: true } // 返回更新后的数据
-  );
+  // 开启事务
+  const session = await mongoose.startSession();
 
-  // 如果 tool 为 null，说明条件不满足（库存不足/工具不存在）
-  if (!tool) {
-    throw new Error('库存不足或工具不可用');
+  try {
+    let record;
+
+    await session.withTransaction(async () => {
+      // 1. 原子扣减库存
+      const tool = await Tool.findOneAndUpdate(
+        {
+          _id: toolId,
+          status: 'available',
+          availableStock: { $gte: amount },
+          stock: { $gte: amount },
+        },
+        {
+          $inc: { availableStock: -amount },
+        },
+        {
+          new: true,
+          session,
+        }
+      );
+
+      if (!tool) {
+        throw new Error('库存不足或工具不可用');
+      }
+
+      // 2. 创建借用记录
+      const records = await ToolBorrowRecord.create(
+        [
+          {
+            tool: toolId,
+            borrower,
+            lender,
+            quantity: amount,
+            status: 'borrowing',
+          },
+        ],
+        { session }
+      );
+
+      record = records[0];
+    });
+
+    return record;
+  } finally {
+    await session.endSession();
   }
-  // 创建借用记录
-  const record = await ToolBorrowRecord.create({
-    tool: toolId,
-    borrower,
-    lender,
-    quantity,
-    status: 'borrowing',
-  });
-
-  return record;
 };
 
 // 归还工具
-exports.returnTool = async ({ toolId, returner }) => {
+exports.returnTool = async ({ recordId, returner }) => {
   // 参数校验
-  if (!toolId) {
-    throw new Error('工具ID不能为空');
+  if (!recordId) {
+    throw new Error('借用记录ID不能为空');
   }
 
   if (!returner) {
     throw new Error('归还人不能为空');
   }
-  //根据toolId来查找到借这个工具的记录
-  const record = await ToolBorrowRecord.findOne({
-    tool: toolId,
-    borrower: returner, // 谁借的谁还
-    status: 'borrowing', // 只找未归还的
-  });
 
-  if (!record) {
-    throw new Error('工具借用记录不存在');
+  // 开启事务
+  const session = await mongoose.startSession();
+
+  try {
+    let result;
+
+    await session.withTransaction(async () => {
+      // 1. 原子地将指定借用记录标记为已归还
+      // 只有仍在借用中的记录才能更新，避免重复归还
+      const record = await ToolBorrowRecord.findOneAndUpdate(
+        {
+          _id: recordId,
+          status: 'borrowing',
+        },
+        {
+          $set: {
+            status: 'returned',
+            returnAt: new Date(),
+            returner,
+          },
+        },
+        {
+          new: true,
+          session,
+        }
+      );
+
+      if (!record) {
+        throw new Error('借用记录不存在或已经归还');
+      }
+
+      // 2. 在同一事务中恢复库存，并检查库存上限
+      const tool = await Tool.findOneAndUpdate(
+        {
+          _id: record.tool,
+          $expr: {
+            $lte: [{ $add: ['$availableStock', record.quantity] }, '$stock'],
+          },
+        },
+        {
+          $inc: { availableStock: record.quantity },
+        },
+        {
+          new: true,
+          session,
+        }
+      );
+
+      if (!tool) {
+        throw new Error('归还失败：库存异常，操作已回滚');
+      }
+
+      result = record;
+    });
+
+    return result;
+  } finally {
+    await session.endSession();
   }
-
-  //并发安全锁
-  const tool = await Tool.findOneAndUpdate(
-    {
-      _id: record.tool,
-      // 安全判断：归还后不能超过总库存
-      $expr: { $lte: [{ $add: ['$availableStock', record.quantity] }, '$stock'] },
-    },
-    {
-      // 原子增加库存（并发安全）
-      $inc: { availableStock: record.quantity },
-    },
-    { new: true }
-  );
-
-  // 如果 tool = null，说明归还后会超库存 → 异常
-  if (!tool) {
-    throw new Error('归还失败：库存异常，可能是重复归还');
-  }
-
-  // 更新记录
-  record.status = 'returned';
-  record.returnAt = new Date();
-  record.returner = returner;
-
-  await record.save();
-
-  return record;
 };
-
 // 获取全部记录（分页）
 exports.getAll = async (page = 1, pageSize = 10) => {
   page = parseInt(page);
