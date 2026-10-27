@@ -30,8 +30,8 @@ exports.borrowToolRecord = async (req, res) => {
 exports.returnToolRecord = async (req, res) => {
   try {
     const result = await returnTool({
-      toolId: req.params.toolId,
-      returner: req.body.returner,
+      recordId: req.params.recordId,
+      returner: req.user._id,
     });
 
     res.sendSuccess(200, result, '归还工具成功');
