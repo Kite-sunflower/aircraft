@@ -1,4 +1,5 @@
 const Tool = require('../models/tool');
+const ToolBorrowRecord = require('../models/toolBorrowRecord');
 const pagination = require('../utils/pagination');
 const buildQuery = require('../utils/buildQuery');
 
@@ -84,15 +85,30 @@ exports.update = async (id, updateData) => {
 
   return result;
 };
-exports.deleteOne = async (id) => {
-  const tool = await Tool.findByIdAndDelete(id);
 
-  if (!tool) throw new Error('工具不存在');
+exports.deleteOne = async (id) => {
+  const tool = await Tool.findById(id);
+
+  if (!tool) {
+    throw new Error('工具不存在');
+  }
+
+  const activeRecord = await ToolBorrowRecord.findOne({
+    tool: id,
+    status: 'borrowing',
+  });
+
+  if (activeRecord) {
+    throw new Error('该工具仍有未归还的借用记录，不能删除');
+  }
+
+  await Tool.findByIdAndDelete(id);
 
   return {
     deletedCount: 1,
   };
 };
+
 exports.deleteBatch = async (ids) => {
   if (!Array.isArray(ids) || ids.length === 0) {
     throw new Error('请选择删除的数据');
@@ -104,11 +120,22 @@ exports.deleteBatch = async (ids) => {
     throw new Error('部分数据不存在');
   }
 
+  const activeRecord = await ToolBorrowRecord.findOne({
+    tool: { $in: ids },
+    status: 'borrowing',
+  });
+
+  if (activeRecord) {
+    throw new Error('选中的工具中存在未归还的借用记录，不能批量删除');
+  }
+
   const result = await Tool.deleteMany({ _id: { $in: ids } });
+
   return {
     deletedCount: result.deletedCount,
   };
 };
+
 exports.statusSetup = async (id, status) => {
   const tool = await Tool.findById(id);
   if (!tool) {
